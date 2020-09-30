@@ -106,7 +106,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             await asyncio.sleep(2)
 
             msg = await ctx.send(f"Creating Voice Channel For {players} Players.")
-            vc = await guild.create_voice_channel(user_limit=players, name=f"Game {num + 1}", category=category1)
+            vc = await guild.create_voice_channel(user_limit=players, name=f"Game {gamenum}", category=category1)
             txt = await guild.create_text_channel(name=f"Host Panel", category=category1)
             await txt.set_permissions(ctx.guild.default_role, send_messages=False, read_messages=False)
             await vc.set_permissions(ctx.guild.default_role, connect=True)
@@ -122,7 +122,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 logs.add_field(name="Time Created:", value=f"{datetime_object}", inline=True)
                 logs.add_field(name="Time Deleted:", value=f"N/A", inline=False)
                 logs.add_field(name="Max Players Limit:", value=f"{players} Players", inline=True)
-                logs.add_field(name="Lobby Name:", value=f"{gamenum}", inline=True)
+                logs.add_field(name="Lobby Name:", value=f"Game {gamenum}", inline=True)
                 logs.set_footer(text="Created By <Dips#6999")
                 logss1 = await channel.send(embed=logs)
                 #something
@@ -141,7 +141,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             category1 = await ctx.guild.create_category(f"Hosted By {ctx.message.author}")
             await asyncio.sleep(2)
             msg = await ctx.send(f"Creating Voice Channel For {players} Players.")
-            vc = await guild.create_voice_channel(user_limit=players, name=f"Game {random.randint(1000, 9999)}", category=category1)
+            vc = await guild.create_voice_channel(user_limit=players, name=f"Game {gamenum}", category=category1)
             txt = await guild.create_text_channel(name=f"Host Panel", category=category1)
             await txt.set_permissions(ctx.guild.default_role, send_messages=False, read_messages=False)
             await txt.set_permissions(ctx.message.author, send_messages=False, read_messages=True)
@@ -158,7 +158,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 logs.add_field(name="Time Created:", value=f"{datetime_object}", inline=True)
                 logs.add_field(name="Time Deleted:", value=f"N/A", inline=False)
                 logs.add_field(name="Max Players Limit:", value=f"{players} Players", inline=True)
-                logs.add_field(name="Lobby Name:", value=f"{gamenum}", inline=True)
+                logs.add_field(name="Lobby Name:", value=f"Game {gamenum}", inline=True)
                 logs.set_footer(text="Created By <Dips#6999")
                 logss = await channel.send(embed=logs)
              
@@ -247,7 +247,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     logs_new.add_field(name="Time Created:", value=f"{datetime_object}", inline=True)
                     logs_new.add_field(name="Time Deleted:", value=f"{datetime_object_delete}", inline=False)
                     logs_new.add_field(name="Max Players Limit:", value=f"{players} Players", inline=True)
-                    logs_new.add_field(name="Lobby Name:", value=f"{gamenum}", inline=True)
+                    logs_new.add_field(name="Lobby Name:", value=f"Game {gamenum}", inline=True)
                     logs_new.set_footer(text="Created By <Dips#6999")
                     if role == None:
                         await logss1.edit(embed=logs_new)
