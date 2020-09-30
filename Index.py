@@ -55,8 +55,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
         roles = json.load(f)
 
 
-    with open("counter.json", 'r') as f:
-        count = json.load(f)
+
 
 
     with open("audit.json", 'r') as f:
@@ -104,7 +103,10 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
             category1 = await ctx.guild.create_category(f"Hosted By {ctx.message.author}")
             await asyncio.sleep(2)
+
             msg = await ctx.send(f"Creating Voice Channel For {players} Players.")
+            with open("counter.json", 'r') as f:
+                count = json.load(f)
             vc = await guild.create_voice_channel(user_limit=players, name=f"Game {int(count[str(ctx.guild.id)]) + 1}", category=category1)
             txt = await guild.create_text_channel(name=f"Host Panel", category=category1)
             await txt.set_permissions(ctx.guild.default_role, send_messages=False, read_messages=False)
