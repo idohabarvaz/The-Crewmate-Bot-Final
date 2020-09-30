@@ -14,6 +14,7 @@ load_dotenv()
 
 TOKEN = os.environ["TOKEN"]
 
+print(os.environ)
 def get_prefix(bot, message):
     with open('prefixes.json', 'r') as f:
         prefixes = json.load(f)
