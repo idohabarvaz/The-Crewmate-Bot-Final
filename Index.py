@@ -12,7 +12,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-TOKEN = os.getenv('BOT_TOKEN')
+TOKEN = os.environ["TOKEN"]
 
 def get_prefix(bot, message):
     with open('prefixes.json', 'r') as f:
