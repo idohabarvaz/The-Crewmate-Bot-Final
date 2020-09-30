@@ -1,7 +1,7 @@
 discord
 asyncio
 datetime
-json
+stdlib
 requests
-os
+as
 dotenv
