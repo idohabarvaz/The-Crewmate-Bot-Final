@@ -106,7 +106,6 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             await asyncio.sleep(2)
 
             msg = await ctx.send(f"Creating Voice Channel For {players} Players.")
-            num = int(count[str(ctx.guild.id)])
             vc = await guild.create_voice_channel(user_limit=players, name=f"Game {num + 1}", category=category1)
             txt = await guild.create_text_channel(name=f"Host Panel", category=category1)
             await txt.set_permissions(ctx.guild.default_role, send_messages=False, read_messages=False)
