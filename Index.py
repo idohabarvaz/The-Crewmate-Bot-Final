@@ -98,6 +98,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
         await ctx.send("You Don't Have The Required Role To Start Hosting!")
     elif players < 11 and players > 3 and str(ctx.message.author.voice.channel.id) == data[str(ctx.guild.id)] and data[str(ctx.guild.id)] != None and role_re in ctx.message.author.roles:
         await ctx.send("Creating Lobby...")
+        gamenum = random.randint(1000, 9999)
         if role == None:
                 
 
@@ -105,8 +106,6 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             await asyncio.sleep(2)
 
             msg = await ctx.send(f"Creating Voice Channel For {players} Players.")
-            with open("counter.json", 'r') as f:
-                count = json.load(f)
             num = int(count[str(ctx.guild.id)])
             vc = await guild.create_voice_channel(user_limit=players, name=f"Game {num + 1}", category=category1)
             txt = await guild.create_text_channel(name=f"Host Panel", category=category1)
@@ -124,17 +123,14 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 logs.add_field(name="Time Created:", value=f"{datetime_object}", inline=True)
                 logs.add_field(name="Time Deleted:", value=f"N/A", inline=False)
                 logs.add_field(name="Max Players Limit:", value=f"{players} Players", inline=True)
-                logs.add_field(name="Lobby Name:", value=f"Game {int(count[str(ctx.guild.id)]) + 1}", inline=True)
+                logs.add_field(name="Lobby Name:", value=f"{gamenum}", inline=True)
                 logs.set_footer(text="Created By <Dips#6999")
                 logss1 = await channel.send(embed=logs)
                 #something
 
 
 
-            count[str(ctx.guild.id)] = count[str(ctx.guild.id)] + 1
 
-            with open("counter.json", 'w') as f:
-                json.dump(count, f, indent=4)
 
 
 
@@ -146,7 +142,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             category1 = await ctx.guild.create_category(f"Hosted By {ctx.message.author}")
             await asyncio.sleep(2)
             msg = await ctx.send(f"Creating Voice Channel For {players} Players.")
-            vc = await guild.create_voice_channel(user_limit=players, name=f"Game {int(count[str(ctx.guild.id)]) + 1}", category=category1)
+            vc = await guild.create_voice_channel(user_limit=players, name=f"Game {random.randint(1000, 9999)}", category=category1)
             txt = await guild.create_text_channel(name=f"Host Panel", category=category1)
             await txt.set_permissions(ctx.guild.default_role, send_messages=False, read_messages=False)
             await txt.set_permissions(ctx.message.author, send_messages=False, read_messages=True)
@@ -163,7 +159,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 logs.add_field(name="Time Created:", value=f"{datetime_object}", inline=True)
                 logs.add_field(name="Time Deleted:", value=f"N/A", inline=False)
                 logs.add_field(name="Max Players Limit:", value=f"{players} Players", inline=True)
-                logs.add_field(name="Lobby Name:", value=f" Game {int(count[str(ctx.guild.id)]) + 1}", inline=True)
+                logs.add_field(name="Lobby Name:", value=f"{gamenum}", inline=True)
                 logs.set_footer(text="Created By <Dips#6999")
                 logss = await channel.send(embed=logs)
              
@@ -252,7 +248,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     logs_new.add_field(name="Time Created:", value=f"{datetime_object}", inline=True)
                     logs_new.add_field(name="Time Deleted:", value=f"{datetime_object_delete}", inline=False)
                     logs_new.add_field(name="Max Players Limit:", value=f"{players} Players", inline=True)
-                    logs_new.add_field(name="Lobby Name:", value=f"Game {int(count[str(ctx.guild.id)]) + 1}", inline=True)
+                    logs_new.add_field(name="Lobby Name:", value=f"{gamenum}", inline=True)
                     logs_new.set_footer(text="Created By <Dips#6999")
                     if role == None:
                         await logss1.edit(embed=logs_new)
