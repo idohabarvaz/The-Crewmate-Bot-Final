@@ -3,3 +3,5 @@ asyncio
 datetime
 json
 requests
+os
+dotenv
