@@ -2,7 +2,7 @@
 import discord
 from discord.ext import commands
 import json
-from discord.ext.commands import has_permissions
+from discord.ext.commands import has_permissions, CheckFailure
 import requests
 import asyncio
 import random
@@ -149,7 +149,6 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             await vc.set_permissions(ctx.message.author, mute_members=True, move_members=True)
             await vc.set_permissions(role, connect=True)
             await vc.set_permissions(ctx.guild.default_role, connect=False)
-            count[str(ctx.guild.id)] = count[str(ctx.guild.id)] + 1
             if str(ctx.guild.id) in log:
                 channel = bot.get_channel(int(log[str(ctx.guild.id)]))
                 datetime_object = datetime.datetime.now()
@@ -168,8 +167,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             
             
 
-            with open("counter.json", 'w') as f:
-                json.dump(count, f, indent=4)
+
 
             
             
@@ -450,9 +448,9 @@ async def on_guild_join(guild):
 
 
 @settings.error
-async def setting_error(error, ctx):
-    if isinstance(error, MissingPermissions):
-        await ctx.send("You Don't Have Permission To Use That!")
+async def settings_error(error, ctx):
+    if isinstance(error, CheckFailure):
+        await ctx.send("Look Like You Don't Have Permission To Use That!")
 
    
 
@@ -519,6 +517,7 @@ async def on_guild_remove(guild):
 
 
 @bot.command()
+@has_permissions(manage_roles=True)
 async def changeprefix(ctx, prefix):
     with open('prefixes.json', 'r') as f:
         prefixes = json.load(f)
@@ -529,6 +528,9 @@ async def changeprefix(ctx, prefix):
         json.dump(prefixes, f, indent=4)
 
     await ctx.send(f"Prefix Changed To `{prefix}`")
+
+
+
 
 
 
