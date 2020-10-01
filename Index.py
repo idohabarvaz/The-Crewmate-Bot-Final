@@ -2,6 +2,7 @@
 import discord
 from discord.ext import commands
 import json
+from discord.ext.commands import has_permissions
 import requests
 import asyncio
 import random
@@ -313,6 +314,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
 
 @bot.command()
+@has_permissions(manage_channels=True)  
 async def settings(ctx, action=None, *, var=None):
     guild = ctx.guild
     print(var, action)
@@ -446,7 +448,12 @@ async def on_guild_join(guild):
 
 
 
-      
+
+@settings.error
+async def setting_error(error, ctx):
+    if isinstance(error, MissingPermissions):
+        await ctx.send("You Don't Have Permission To Use That!")
+
    
 
 
