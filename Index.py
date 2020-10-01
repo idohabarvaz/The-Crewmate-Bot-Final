@@ -114,13 +114,13 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             await txt.set_permissions(ctx.message.author, send_messages=False, read_messages=True)
             await vc.set_permissions(ctx.message.author, mute_members=True, move_members=True)
             if str(ctx.guild.id) in log:
-                datetime_object = datetime.datetime.now()
+                datetime_object = datetime.datetime.now(timezone.utc)
                 channel = bot.get_channel(int(log[str(ctx.guild.id)]))
 
                 logs=discord.Embed(title="Lobby Logs", color=0x1943c2)
                 logs.set_author(name="Game Info")
                 logs.add_field(name="Lobby Host:", value=f"{ctx.message.author}", inline=False)
-                logs.add_field(name="Time Created:", value=f"{datetime_object}", inline=True)
+                logs.add_field(name="Time Created:", value=f"{datetime_object} UTC", inline=True)
                 logs.add_field(name="Time Deleted:", value=f"N/A", inline=False)
                 logs.add_field(name="Max Players Limit:", value=f"{players} Players", inline=True)
                 logs.add_field(name="Lobby Name:", value=f"Game {gamenum}", inline=True)
@@ -144,11 +144,12 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             msg = await ctx.send(f"Creating Voice Channel For {players} Players.")
             vc = await guild.create_voice_channel(user_limit=players, name=f"Game {gamenum}", category=category1)
             txt = await guild.create_text_channel(name=f"Host Panel", category=category1)
+            await vc.set_permissions(ctx.guild.default_role, connect=False)
             await txt.set_permissions(ctx.guild.default_role, send_messages=False, read_messages=False)
             await txt.set_permissions(ctx.message.author, send_messages=False, read_messages=True)
             await vc.set_permissions(ctx.message.author, mute_members=True, move_members=True)
             await vc.set_permissions(role, connect=True)
-            await vc.set_permissions(ctx.guild.default_role, connect=False)
+     
             if str(ctx.guild.id) in log:
                 channel = bot.get_channel(int(log[str(ctx.guild.id)]))
                 datetime_object = datetime.datetime.now()
@@ -237,14 +238,14 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
 
                 if str(ctx.guild.id) in log:
-                    datetime_object_delete = datetime.datetime.now()
+                    datetime_object_delete = datetime.datetime.now(timezone.utc)
                     channel = bot.get_channel(int(log[str(ctx.guild.id)]))
 
                     logs_new=discord.Embed(title="Lobby Logs", color=0x1943c2)
                     logs_new.set_author(name="Game Info")
                     logs_new.add_field(name="Lobby Host:", value=f"{ctx.message.author}", inline=False)
-                    logs_new.add_field(name="Time Created:", value=f"{datetime_object}", inline=True)
-                    logs_new.add_field(name="Time Deleted:", value=f"{datetime_object_delete}", inline=False)
+                    logs_new.add_field(name="Time Created:", value=f"{datetime_object} UTC", inline=True)
+                    logs_new.add_field(name="Time Deleted:", value=f"{datetime_object_delete} UTC", inline=False)
                     logs_new.add_field(name="Max Players Limit:", value=f"{players} Players", inline=True)
                     logs_new.add_field(name="Lobby Name:", value=f"Game {gamenum}", inline=True)
                     logs_new.set_footer(text="Created By <Dips#6999")
