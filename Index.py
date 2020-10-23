@@ -548,7 +548,15 @@ async def on_ready():
 
         
 
+@bot.command()
+async def rename(ctx, *, new_name):
+    channel = ctx.author.voice.channel.id
+    await channel.edit(name=new_name)
 
+        
+        
+        
+        
 
 
 @bot.event
