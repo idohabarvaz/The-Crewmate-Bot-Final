@@ -551,13 +551,15 @@ async def on_ready():
 @bot.command()
 @has_permissions(manage_channels=True)
 async def rename(ctx, *, new_name):
-    if ctx.author.voice.channel.id != None:
+    try:
+        int(ctx.author.voice.channel.id)
+    except:
+        await ctx.send("Please Enter A Voice Channel To Use This Command")
+    else:
         channel = ctx.author.voice.channel
         old_name = channel.name
         await channel.edit(name=new_name)
         await ctx.send(f"Channel Name Changed From `{old_name}`=>`{new_name}`")
-    else:
-        await ctx.send("Please Enter A Voice Channel To Use This Command")
 
 
         
