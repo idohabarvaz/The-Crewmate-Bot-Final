@@ -554,7 +554,7 @@ async def rename(ctx, *, new_name):
     channel = ctx.author.voice.channel
     channel_name = [channel]
     await channel.edit(name=new_name)
-    await ctx.send(f"Channel Name Changed From `{channel_name}`=>`{new_name}`")
+    await ctx.send(f"Channel Name Changed, New name =>`{new_name}`")
 
         
         
