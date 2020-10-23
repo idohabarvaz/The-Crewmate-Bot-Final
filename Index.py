@@ -553,6 +553,7 @@ async def on_ready():
 async def rename(ctx, *, new_name):
     channel = ctx.author.voice.channel
     await channel.edit(name=new_name)
+    await ctx.send(f"Channel Name Changed From `{channel}`=>`{new_name}`")
 
         
         
