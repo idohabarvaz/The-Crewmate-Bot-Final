@@ -552,8 +552,9 @@ async def on_ready():
 @has_permissions(manage_channels=True)
 async def rename(ctx, *, new_name):
     channel = ctx.author.voice.channel
+    channel_name = [channel]
     await channel.edit(name=new_name)
-    await ctx.send(f"Channel Name Changed From `{channel}`=>`{new_name}`")
+    await ctx.send(f"Channel Name Changed From `{channel_name}`=>`{new_name}`")
 
         
         
@@ -596,7 +597,8 @@ async def help(ctx):
     embed.add_field(name="@Crewmate ", value="Shows prefix for current server", inline=True)
     embed.add_field(name=data[str(ctx.guild.id)] + "Host (Players Playing) (Optional:@Role)", value="Hosts a game, \n creating a channel and an admin panel \n with the ability to mute all / or make a role only lobby", inline=False)
     embed.add_field(name=data[str(ctx.guild.id)] + "Settings", value="Opens the settings menu", inline=True)
-    embed.add_field(name=data[str(ctx.guild.id)] + "changeprefix", value="Changes the prefix for this server (@Crewmate to view current prefix)", inline=False)
+    embed.add_field(name=data[str(ctx.guild.id)] + "Changeprefix", value="Changes the prefix for this server (@Crewmate to view current prefix)", inline=False)
+    embed.add_field(name=data[str(ctx.guild.id)] + "Rename", value="Changes the name for your current vc", inline=True)
     embed.set_footer(text="Coded by <Dips#6999 // And Idea By Danny-#4531")
     await ctx.send(embed=embed)
 
