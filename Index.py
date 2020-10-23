@@ -295,7 +295,6 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
                 await msg15.remove_reaction("📝", host)
 
-                await txt.send("Type The Name You Wish To Change To")
 
                 await txt.set_permissions(host, send_messages=True, read_messages=True)
                 lobbyName = await bot.wait_for("message",check=nameCheck)
