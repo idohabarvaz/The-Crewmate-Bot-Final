@@ -184,18 +184,20 @@ async def host(ctx, players: int, *, role:discord.Role=None):
         embed=discord.Embed(title="Your Host Panel!", description="This Is Your Personal Host Panel!", color=0x53e4bb)
         embed.add_field(name="**React With 🔇 To Mute ** ", value="React Once To Mute All And Again To Unmute", inline=False)
         embed.add_field(name="**React With 🔒 To Lock **", value="React Once To Lock The Lobby And Again To Open", inline=False)
-        embed.add_field(name="**React With 🚫 To Close **", value="React To Close The Your Lobbu", inline=True)
+        embed.add_field(name="**React With 🚫 To Close **", value="React To Close The Your Lobby", inline=False)
+        embed.add_field(name="**React With 📝 To Rename **", value="React To Rename Your Lobby Name", inline=True)
         msg15 = await txt.send(embed=embed)
         await msg15.add_reaction("🔇")
         await msg15.add_reaction("🔒")
         await msg15.add_reaction("🚫")
+        await msg15.add_reaction("📝")
         #await msg15.add_reaction("emoji")
         await asyncio.sleep(3)
         await msg.delete()
         await ctx.message.delete()
         while True:
             def check(reaction, user):
-                return user == host and user != "Crewmate#9393" and str(reaction.emoji) == "🚫" or "🔇" or "🔒"
+                return user == host and user != "Crewmate#9393" and str(reaction.emoji) == "🚫" or "🔇" or "🔒" or "📝"
 
 
 
@@ -228,7 +230,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
             half = int(vc.user_limit) / 2
 
-            if str(reaction.emoji) == "🚫" and ctx.message.author == ctx.message.author and len(vc.members) <= half:
+            if str(reaction.emoji) == "🚫" and ctx.message.author == user and len(vc.members) <= half:
                     
                  
                 await msg15.remove_reaction("🚫", host)
@@ -287,7 +289,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                         
                         muted = False
                         print(muted)
-            elif str(reaction.emoji) == "🔒" and ctx.message.author == ctx.message.author:
+            elif str(reaction.emoji) == "🔒" and ctx.message.author == user:
                 await msg15.remove_reaction("🔒", host)
                 
                 if locked == True:
@@ -301,6 +303,22 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     locked = True
                     print(f" locked is {locked}")
                     print(vc.members)
+            elif str(reaction.emoji) == "📝" and ctx.message.author == user:
+                def nameCheck(m):
+                    return m.content != ""
+
+
+                await msg15.remove_reaction("📝", host)
+
+                await txt.set_permissions(host, send_messages=True, read_messages=True)
+                lobbyName = await bot.wait_for("message",check=nameCheck)
+                await vc.edit(name=lobbyName.content)
+                await txt.set_permissions(host, send_messages=False, read_messages=True)
+                await txt.purge(limit=1)
+
+                
+
+
 
 
 
@@ -659,16 +677,6 @@ async def help(ctx):
 
 
 bot.run(TOKEN)
-
-
-
-
-
-
-
-
-
-
 
 
 
