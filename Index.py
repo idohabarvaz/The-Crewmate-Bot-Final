@@ -62,6 +62,10 @@ async def host(ctx, players: int, *, role:discord.Role=None):
     with open("audit.json", 'r') as f:
         log = json.load(f)
 
+
+    with open('ads.json', 'r') as f:
+        ad = json.load(f)
+
     
 
 
@@ -113,19 +117,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             await vc.set_permissions(ctx.guild.default_role, connect=True)
             await txt.set_permissions(ctx.message.author, send_messages=False, read_messages=True)
             await vc.set_permissions(ctx.message.author, mute_members=True, move_members=True)
-            if str(ctx.guild.id) in log:
-                datetime_object = datetime.datetime.now(timezone.utc)
-                channel = bot.get_channel(int(log[str(ctx.guild.id)]))
-
-                logs=discord.Embed(title="Lobby Logs", color=0x1943c2)
-                logs.set_author(name="Game Info")
-                logs.add_field(name="Lobby Host:", value=f"{ctx.message.author}", inline=False)
-                logs.add_field(name="Time Created:", value=f"{datetime_object} UTC", inline=True)
-                logs.add_field(name="Time Deleted:", value=f"N/A", inline=False)
-                logs.add_field(name="Max Players Limit:", value=f"{players} Players", inline=True)
-                logs.add_field(name="Lobby Name:", value=f"Game {gamenum}", inline=True)
-                logs.set_footer(text="Created By <Dips#6999")
-                logss1 = await channel.send(embed=logs)
+            
                 #something
 
 
@@ -149,19 +141,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             await txt.set_permissions(ctx.message.author, send_messages=False, read_messages=True)
             await vc.set_permissions(ctx.message.author, mute_members=True, move_members=True)
             await vc.set_permissions(role, connect=True)
-     
-            if str(ctx.guild.id) in log:
-                channel = bot.get_channel(int(log[str(ctx.guild.id)]))
-                datetime_object = datetime.datetime.now()
-                logs=discord.Embed(title="Lobby Logs", color=0x1943c2)
-                logs.set_author(name="Game Info")
-                logs.add_field(name="Lobby Host:", value=f"{ctx.message.author.mention}", inline=False)
-                logs.add_field(name="Time Created:", value=f"{datetime_object} UTC", inline=True)
-                logs.add_field(name="Time Deleted:", value=f"N/A", inline=False)
-                logs.add_field(name="Max Players Limit:", value=f"{players} Players", inline=True)
-                logs.add_field(name="Lobby Name:", value=f"Game {gamenum}", inline=True)
-                logs.set_footer(text="Created By <Dips#6999")
-                logss = await channel.send(embed=logs)
+
              
 
 
@@ -195,7 +175,28 @@ async def host(ctx, players: int, *, role:discord.Role=None):
         await asyncio.sleep(3)
         await msg.delete()
         await ctx.message.delete()
+        if str(ctx.guild.id) in ad:
+            channel = bot.get_channel(int(ad[str(ctx.guild.id)]))
+            join=discord.Embed(title=f"**Game {gamenum}**", description="Click Below To Join!", color=0x11ff00)
+            join.set_thumbnail(url=f"{bot.user.avatar_url}")
+            join.add_field(name="**Player Limit:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
+            joinMessage = await channel.send(embed=join)
+            await channel.send(await vc.create_invite())
+
+
+
+
+
         while True:
+            channel = bot.get_channel(int(ad[str(ctx.guild.id)]))
+            join2=discord.Embed(title=f"**Game {gamenum}**", description="Click Below To Join!", color=0x11ff00)
+            join2.set_thumbnail(url=f"{bot.user.avatar_url}")
+            join2.add_field(name="**Player Limit:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
+            await joinMessage.edit(embed=join2)
+
+
+
+
             def check(reaction, user):
                 return user == host and user != "Crewmate#9393" and str(reaction.emoji) == "🚫" or "🔇" or "🔒" or "📝"
 
@@ -239,22 +240,6 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 await asyncio.sleep(5)
 
 
-                if str(ctx.guild.id) in log:
-                    datetime_object_delete = datetime.datetime.now(timezone.utc)
-                    channel = bot.get_channel(int(log[str(ctx.guild.id)]))
-
-                    logs_new=discord.Embed(title="Lobby Logs", color=0x1943c2)
-                    logs_new.set_author(name="Game Info")
-                    logs_new.add_field(name="Lobby Host:", value=f"{ctx.message.author}", inline=False)
-                    logs_new.add_field(name="Time Created:", value=f"{datetime_object} UTC", inline=True)
-                    logs_new.add_field(name="Time Deleted:", value=f"{datetime_object_delete} UTC", inline=False)
-                    logs_new.add_field(name="Max Players Limit:", value=f"{players} Players", inline=True)
-                    logs_new.add_field(name="Lobby Name:", value=f"Game {gamenum}", inline=True)
-                    logs_new.set_footer(text="Created By <Dips#6999")
-                    if role == None:
-                        await logss1.edit(embed=logs_new)
-                    elif role != None:
-                        await logss.edit(embed=logs_new)
 
                 await vc.delete()
                 await txt.delete()
@@ -348,6 +333,10 @@ async def settings(ctx, action=None, *, var=None):
     with open("audit.json", 'r') as f:
         log = json.load(f)
 
+
+    with open("ads.json", 'r') as f:
+        ad = json.load(f)
+
     
 
 
@@ -403,6 +392,13 @@ async def settings(ctx, action=None, *, var=None):
             json.dump(log, f, indent=4)
         await ctx.send("Audit Log Channel Set.")
 
+    elif action == "setadlobby" and var != None:
+        ad[str(ctx.guild.id)] = str(var)
+
+        with open('ads.json', 'w') as f:
+            json.dump(ad, f, indent=4)
+        await ctx.send("Channel set.")
+
 
 
 
@@ -417,6 +413,7 @@ async def settings(ctx, action=None, *, var=None):
         settings.add_field(name="Sets The Audit Logs Channel", value=f"`settings setauditlogchannel (text-channel-id)` ", inline=False)
         settings.add_field(name="Hide Full Lobbies, Default `False`", value=f"`settings hidefull`, Currently Set To `{data[str(ctx.guild.id)]}`", inline=True)
         settings.add_field(name="Sets The Role Required For Start Hosting", value=f"`settings sethostrole (host-role-name)` ", inline=False)
+        settings.add_field(name="Sets The Channel To Send Other People Lobbys", value=f"`settings setadlobby (AD-channel-id)` ", inline=False)
         settings.set_footer(text=f"Requested By {ctx.message.author}")
         await ctx.send(embed=settings)
 
@@ -528,6 +525,8 @@ async def on_guild_remove(guild):
     with open("counter.json", 'w') as f:
         json.dump(count, f, indent=4)
 
+    
+
 
 
 
@@ -613,6 +612,7 @@ async def invite(ctx):
 
             
 @bot.command()
+@commands.cooldown(rate=1, per=4, type=commands.BucketType.user)
 async def help(ctx):
     with open("prefixes.json", 'r') as f:
         data = json.load(f)  
@@ -628,7 +628,6 @@ async def help(ctx):
 
 
  
-
 
 
 
