@@ -189,7 +189,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
         while True:
             channel = bot.get_channel(int(ad[str(ctx.guild.id)]))
-            join2=discord.Embed(title=f"**Game {gamenum}**", description="Click Below To Join!", color=0x11ff00)
+            join2=discord.Embed(title=f"**{vc.name}**", description="Click Below To Join!", color=0x11ff00)
             join2.set_thumbnail(url=f"{bot.user.avatar_url}")
             join2.add_field(name="**Player Limit:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
             await joinMessage.edit(embed=join2)
@@ -208,7 +208,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 hide = json.load(f)
 
             if hide[str(ctx.guild.id)] == True and vc.user_limit == len(vc.members):
-                print("Doesn't Viewing Channel")
+                print("Arent Viewing Channel")
                 await vc.set_permissions(ctx.guild.default_role, view_channel=False)
             elif vc.user_limit != len(vc.members):
                 print("Viewing Channel")
