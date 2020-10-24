@@ -46,7 +46,7 @@ bot = commands.Bot(command_prefix=get_prefix,help_command = None)
 
 #ctx.guild.default_role
 
-@bot.command()
+@bot.command(aliases = ['h'])
 async def host(ctx, players: int, *, role:discord.Role=None):
     roles_list = ctx.author.roles
     roles_list.reverse()
@@ -116,8 +116,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
     elif role != None and top_role < role:
         await ctx.send("Make Sure Your highest Role Is Above The Role You Mentioned!")
     
-    elif str(ctx.guild.id) not in dr and role != None:
-        await ctx.send("You Can't Host Closed Lobby Yet, You Need To Setup The Default Role First!")
+
 
 
     elif role_re not in ctx.message.author.roles:
@@ -360,7 +359,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
 
 
-@bot.command()
+@bot.command(aliases = ['s', 'set'])
 @has_permissions(manage_channels=True)  
 async def settings(ctx, action=None, *, var=None):
     guild = ctx.guild
@@ -571,7 +570,7 @@ async def on_guild_remove(guild):
 
 
 
-@bot.command()
+@bot.command(aliases = ['change', 'cha', 'c'])
 @has_permissions(manage_roles=True)
 async def changeprefix(ctx, prefix):
     with open('prefixes.json', 'r') as f:
@@ -602,7 +601,7 @@ async def on_ready():
 
         
 
-@bot.command()
+@bot.command(aliases = ['ren', 're'])
 @has_permissions(manage_channels=True)
 async def rename(ctx, *, new_name):
     try:
@@ -641,14 +640,14 @@ async def on_message(message):
  
 
 
-@bot.command()
+@bot.command(aliases = ['inv'])
 async def invite(ctx):
     await ctx.send("Want To Add Me To Your Very Own Server? Here's A Link https://discord.com/api/oauth2/authorize?client_id=759429302918840391&permissions=8&scope=bot")
 
 
 
             
-@bot.command()
+@bot.command(aliases = ['hel', 'he'])
 @commands.cooldown(rate=1, per=4, type=commands.BucketType.user)
 async def help(ctx):
     with open("prefixes.json", 'r') as f:
