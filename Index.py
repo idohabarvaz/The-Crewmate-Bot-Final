@@ -48,6 +48,13 @@ bot = commands.Bot(command_prefix=get_prefix,help_command = None)
 
 @bot.command()
 async def host(ctx, players: int, *, role:discord.Role=None):
+    roles_list = ctx.author.roles
+    roles_list.reverse()
+    top_role = roles_list[0]
+
+
+
+    print(role)
     with open("voice.json", 'r') as f:
         data = json.load(f)
 
@@ -66,6 +73,13 @@ async def host(ctx, players: int, *, role:discord.Role=None):
     with open('ads.json', 'r') as f:
         ad = json.load(f)
 
+    with open('defaultRoles.json', 'r') as f:
+        dr = json.load(f)
+
+
+
+    
+
     
 
 
@@ -77,6 +91,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
     muted = False
     locked = True
+    isClosed = False
     guild = ctx.message.guild
     author = ctx.message.author
     host = ctx.message.author
@@ -98,6 +113,12 @@ async def host(ctx, players: int, *, role:discord.Role=None):
         error = await ctx.send("Join The Required Voice Channel To Start Hosting!")
         await asyncio.sleep(10)
         await error.delete()
+    elif role != None and top_role < role:
+        await ctx.send("Make Sure Your highest Role Is Above The Role You Mentioned!")
+    
+    elif str(ctx.guild.id) not in dr and role != None:
+        await ctx.send("You Can't Host Closed Lobby Yet, You Need To Setup The Default Role First!")
+
 
     elif role_re not in ctx.message.author.roles:
         await ctx.send("You Don't Have The Required Role To Start Hosting!")
@@ -131,16 +152,30 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
             await msg.edit(content=f'Lobby Created, Hosted By {ctx.message.author.mention}. Access Your {txt.mention} Here')
         elif role != None:
+
+            overwrites = {
+                guild.default_role: discord.PermissionOverwrite(connect=False, view_channel=False),
+                role: discord.PermissionOverwrite(connect=True, view_channel=True)
+                
+            }
+
+
+
+
+
+
+            #default_role = get(ctx.guild.roles, name=dr[str(ctx.guild.id)])
             category1 = await ctx.guild.create_category(f"Hosted By {ctx.message.author}")
             await asyncio.sleep(2)
             msg = await ctx.send(f"Creating Voice Channel For {players} Players.")
-            vc = await guild.create_voice_channel(user_limit=players, name=f"Game {gamenum}", category=category1)
+            vc = await guild.create_voice_channel(user_limit=players, name=f"Game {gamenum}", category=category1, overwrites=overwrites)
             txt = await guild.create_text_channel(name=f"Host Panel", category=category1)
-            await vc.set_permissions(ctx.guild.default_role, connect=False, view_channel=False)
+            await category1.set_permissions(role, connect=True)
+            await category1.set_permissions(ctx.guild.default_role, connect=False)
             await txt.set_permissions(ctx.guild.default_role, send_messages=False, read_messages=False)
             await txt.set_permissions(ctx.message.author, send_messages=False, read_messages=True)
-            await vc.set_permissions(ctx.message.author, mute_members=True, move_members=True)
-            await vc.set_permissions(role, connect=True)
+            await vc.set_permissions(ctx.message.author, mute_members=True, move_members=True, connect=True)
+            await vc.set_permissions(ctx.guild.default_role, connect=False)
 
              
 
@@ -154,7 +189,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             
             
 
-            await msg.edit(content=f'Lobby Created For ```{role}```, Hosted By {ctx.message.author.mention}. Access Your {txt.mention} Here')
+            await msg.edit(content=f'Lobby Created For `{role}`, Hosted By {ctx.message.author.mention}. Access Your {txt.mention} Here')
             
 
 
@@ -180,10 +215,9 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             join=discord.Embed(title=f"Click Me To Join!", color=0x11ff00)
             embed.set_author(name=f"{host} is Looking For Crewmates!", icon_url=host.avatar_url)
             join.set_thumbnail(url=f"{bot.user.avatar_url}")
-            join.add_field(name="**Player:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
+            join.add_field(name="**Players Playing:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
             joinMessage = await channel.send(embed=join)
             invite = await channel.send(await vc.create_invite())
-            await channel.purge(limit=1)
 
 
 
@@ -191,14 +225,18 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
         while True:
             channel = bot.get_channel(int(ad[str(ctx.guild.id)]))
-            join2=discord.Embed(title=f"Click Me To Join!", url=invite.content, color=0x11ff00)
+            join2=discord.Embed(title=f"Click Me To Join!", color=0x11ff00)
             join2.set_author(name=f"{host} Is Looking For Crewmates!", icon_url=host.avatar_url)
             join2.set_thumbnail(url=f"{bot.user.avatar_url}")
-            join2.add_field(name="**Player:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
-            if role != None:
-                join2.add_field(name="**Lobby Status:**", value=f"{role.mention} Only", inline=True)
-            elif role == None:
+            join2.add_field(name="**Players Playing:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
+            if role != None and isClosed is False:
+                join2.add_field(name="**Lobby Status:**", value=f"Closed For {role.mention}", inline=True)
                 await joinMessage.edit(embed=join2)
+            elif role == None and isClosed is False:
+                join2.add_field(name="**Lobby Status:**", value=f"Open", inline=True)
+                await joinMessage.edit(embed=join2)
+
+
 
 
 
@@ -209,16 +247,6 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
 
 
-
-            with open('hidelobby.json', 'r') as f:
-                hide = json.load(f)
-
-            if hide[str(ctx.guild.id)] == True and vc.user_limit == len(vc.members):
-                print("Arent Viewing Channel")
-                await vc.set_permissions(ctx.guild.default_role, view_channel=False)
-            elif vc.user_limit != len(vc.members):
-                print("Viewing Channel")
-                await vc.set_permissions(ctx.guild.default_role, view_channel=True)
 
 
                     
@@ -243,6 +271,15 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 await msg15.remove_reaction("🚫", host)
                 
                 await txt.send(f"{user.mention} Closed The Lobby, Closing Lobby In 5 Seconds")
+                await invite.delete()
+                closed=discord.Embed(title=f"Joining Unavaliable", color=0xff0000)
+                closed.set_author(name=f"{host} Was Looking For Crewmates!", icon_url=host.avatar_url)
+                closed.set_thumbnail(url=f"{bot.user.avatar_url}")
+                isClosed = True
+                await joinMessage.edit(embed=closed)
+
+
+
                 await asyncio.sleep(5)
 
 
@@ -329,8 +366,7 @@ async def settings(ctx, action=None, *, var=None):
     guild = ctx.guild
     print(var, action)
 
-    with open("hidelobby.json", 'r') as f:
-        data = json.load(f)
+
 
     with open("voice.json", 'r') as f:
         voice = json.load(f)
@@ -344,6 +380,9 @@ async def settings(ctx, action=None, *, var=None):
 
     with open("ads.json", 'r') as f:
         ad = json.load(f)
+
+    with open('defaultRoles.json', 'r') as f:
+        defRole = json.load(f)
 
     
 
@@ -360,28 +399,10 @@ async def settings(ctx, action=None, *, var=None):
         await ctx.send("Voice Channel Set Successfully")
         
 
-    elif action == "hidefull":
-        if data[str(guild.id)] == True:
-
-
-            data[str(ctx.guild.id)] = False
-
-            with open("hidelobby.json", 'w') as f:
-                json.dump(data, f, indent=4)
-            await ctx.send("Set To False, Now Full lobbies will appear as invisible")
 
 
 
 
-        elif data[str(guild.id)] == False:
-
-
-
-            data[str(ctx.guild.id)] = True
-
-            with open("hidelobby.json", 'w') as f:
-                json.dump(data, f, indent=4)
-            await ctx.send("Set To True.")
 
     elif action == "sethostrole" and var != None:
             
@@ -407,6 +428,15 @@ async def settings(ctx, action=None, *, var=None):
             json.dump(ad, f, indent=4)
         await ctx.send("Channel set.")
 
+    elif action == "setdefaultrole" and var != None:
+        defRole[str(ctx.guild.id)] = str(var)
+
+        with open("defaultRoles.json", 'w') as f:
+            json.dump(defRole, f, indent=4)
+        await ctx.send("Default Role Has Been Set!")
+
+
+
 
 
 
@@ -418,10 +448,9 @@ async def settings(ctx, action=None, *, var=None):
     elif var == None and action == None:
         settings=discord.Embed(title="**Crewmate Settings**", color=0xb6a5a5)
         settings.add_field(name="Sets The Voice Channel To Open Hosted Games", value=f"`settings setvoicechannel (voice-channel-id)` ", inline=False)
-        settings.add_field(name="Sets The Audit Logs Channel", value=f"`settings setauditlogchannel (text-channel-id)` ", inline=False)
-        settings.add_field(name="Hide Full Lobbies, Default `False`", value=f"`settings hidefull`, Currently Set To `{data[str(ctx.guild.id)]}`", inline=True)
-        settings.add_field(name="Sets The Role Required For Start Hosting", value=f"`settings sethostrole (host-role-name)` ", inline=False)
+        settings.add_field(name="Sets The Role Required For Start Hosting", value=f"`settings sethostrole (host-role-name)` ", inline=True)
         settings.add_field(name="Sets The Channel To Send Other People Lobbys", value=f"`settings setadlobby (AD-channel-id)` ", inline=False)
+        settings.add_field(name="Sets The Default Role, *Must Do It For Being Able To Host Closed Lobbies", value=f"`settings setdefaultrole (default-role-name)` ", inline=True)
         settings.set_footer(text=f"Requested By {ctx.message.author}")
         await ctx.send(embed=settings)
 
@@ -626,7 +655,7 @@ async def help(ctx):
         data = json.load(f)  
     embed=discord.Embed(title="**Help Menu**", description=data[str(ctx.guild.id)] + "help to get this menu", color=0x36cea8)
     embed.set_thumbnail(url=f"{bot.user.avatar_url}")
-    embed.add_field(name="@Crewmate ", value="Shows prefix for current server", inline=True)
+    embed.add_field(name="@Crewmate prefix ", value="Shows prefix for current server", inline=True)
     embed.add_field(name=data[str(ctx.guild.id)] + "Host (Players Playing) (Optional:@Role)", value="Hosts a game, \n creating a channel and an admin panel \n with the ability to mute all / or make a role only lobby", inline=False)
     embed.add_field(name=data[str(ctx.guild.id)] + "Settings", value="Opens the settings menu", inline=True)
     embed.add_field(name=data[str(ctx.guild.id)] + "Changeprefix", value="Changes the prefix for this server (@Crewmate to view current prefix)", inline=False)
@@ -684,8 +713,4 @@ async def help(ctx):
 
 
 bot.run(TOKEN)
-
-
-
-
 
