@@ -177,11 +177,13 @@ async def host(ctx, players: int, *, role:discord.Role=None):
         await ctx.message.delete()
         if str(ctx.guild.id) in ad:
             channel = bot.get_channel(int(ad[str(ctx.guild.id)]))
-            join=discord.Embed(title=f"**Game {gamenum}**", description="Click Below To Join!", color=0x11ff00)
+            join=discord.Embed(title=f"Click Me To Join!", color=0x11ff00)
+            embed.set_author(name=f"{host} is Looking For Crewmates!", icon_url=host.avatar_url)
             join.set_thumbnail(url=f"{bot.user.avatar_url}")
-            join.add_field(name="**Player Limit:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
+            join.add_field(name="**Player:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
             joinMessage = await channel.send(embed=join)
-            await channel.send(await vc.create_invite())
+            invite = await channel.send(await vc.create_invite())
+            await channel.purge(limit=1)
 
 
 
@@ -189,10 +191,14 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
         while True:
             channel = bot.get_channel(int(ad[str(ctx.guild.id)]))
-            join2=discord.Embed(title=f"**{vc.name}**", description="Click Below To Join!", color=0x11ff00)
+            join2=discord.Embed(title=f"Click Me To Join!", url=invite.content, color=0x11ff00)
+            join2.set_author(name=f"{host} Is Looking For Crewmates!", icon_url=host.avatar_url)
             join2.set_thumbnail(url=f"{bot.user.avatar_url}")
-            join2.add_field(name="**Player Limit:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
-            await joinMessage.edit(embed=join2)
+            join2.add_field(name="**Player:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
+            if role != None:
+                join2.add_field(name="**Lobby Status:**", value=f"{role.mention} Only", inline=True)
+            elif role == None:
+                await joinMessage.edit(embed=join2)
 
 
 
