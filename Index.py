@@ -11,6 +11,7 @@ from discord.utils import find
 import datetime
 import os
 from dotenv import load_dotenv
+import string
 load_dotenv()
 
 TOKEN = os.environ["TOKEN"]
@@ -66,15 +67,11 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
 
 
-    with open("audit.json", 'r') as f:
-        log = json.load(f)
+
 
 
     with open('ads.json', 'r') as f:
         ad = json.load(f)
-
-    with open('defaultRoles.json', 'r') as f:
-        dr = json.load(f)
 
 
 
@@ -135,8 +132,8 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             txt = await guild.create_text_channel(name=f"Host Panel", category=category1)
             await txt.set_permissions(ctx.guild.default_role, send_messages=False, read_messages=False)
             await vc.set_permissions(ctx.guild.default_role, connect=True)
-            await txt.set_permissions(ctx.message.author, send_messages=False, read_messages=True)
-            await vc.set_permissions(ctx.message.author, mute_members=True, move_members=True)
+            await txt.set_permissions(host, send_messages=False, read_messages=True)
+            await vc.set_permissions(host, mute_members=True, move_members=True)
             
                 #something
 
@@ -172,8 +169,8 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             await category1.set_permissions(role, connect=True)
             await category1.set_permissions(ctx.guild.default_role, connect=False)
             await txt.set_permissions(ctx.guild.default_role, send_messages=False, read_messages=False)
-            await txt.set_permissions(ctx.message.author, send_messages=False, read_messages=True)
-            await vc.set_permissions(ctx.message.author, mute_members=True, move_members=True, connect=True)
+            await txt.set_permissions(host, send_messages=False, read_messages=True)
+            await vc.set_permissions(host, mute_members=True, move_members=True, connect=True)
             await vc.set_permissions(ctx.guild.default_role, connect=False)
 
              
@@ -200,11 +197,13 @@ async def host(ctx, players: int, *, role:discord.Role=None):
         embed.add_field(name="**React With 🔒 To Lock **", value="React Once To Lock The Lobby And Again To Open", inline=False)
         embed.add_field(name="**React With 🚫 To Close **", value="React To Close The Your Lobby", inline=False)
         embed.add_field(name="**React With 📝 To Rename **", value="React To Rename Your Lobby Name", inline=True)
+        embed.add_field(name="**React With 🔄 To Transfer **", value="React To Transfer The Host To Somebody Else", inline=False)
         msg15 = await txt.send(embed=embed)
         await msg15.add_reaction("🔇")
         await msg15.add_reaction("🔒")
         await msg15.add_reaction("🚫")
         await msg15.add_reaction("📝")
+        await msg15.add_reaction("🔄")
         #await msg15.add_reaction("emoji")
         await asyncio.sleep(3)
         await msg.delete()
@@ -215,6 +214,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             embed.set_author(name=f"{host} is Looking For Crewmates!", icon_url=host.avatar_url)
             join.set_thumbnail(url=f"{bot.user.avatar_url}")
             join.add_field(name="**Players Playing:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
+            join.add_field(name="**Voice Name:**", value=f"{vc.name}", inline=True)
             joinMessage = await channel.send(embed=join)
             invite = await channel.send(await vc.create_invite())
 
@@ -228,6 +228,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             join2.set_author(name=f"{host} Is Looking For Crewmates!", icon_url=host.avatar_url)
             join2.set_thumbnail(url=f"{bot.user.avatar_url}")
             join2.add_field(name="**Players Playing:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
+            join2.add_field(name="**Voice Name:**", value=f"{vc.name}", inline=True)
             if role != None and isClosed is False:
                 join2.add_field(name="**Lobby Status:**", value=f"Closed For {role.mention}", inline=True)
                 await joinMessage.edit(embed=join2)
@@ -241,7 +242,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
 
             def check(reaction, user):
-                return user == host and user != "Crewmate#9393" and str(reaction.emoji) == "🚫" or "🔇" or "🔒" or "📝"
+                return user == host and user != "Crewmate#9393" and str(reaction.emoji) == "🚫" or "🔇" or "🔒" or "📝" or "🔄"
 
 
 
@@ -264,30 +265,50 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
             half = int(vc.user_limit) / 2
 
-            if str(reaction.emoji) == "🚫" and ctx.message.author == user and len(vc.members) <= half:
+            if str(reaction.emoji) == "🚫" and host == user and len(vc.members) <= half:
+                def confirm_generator(size=6, chars=string.ascii_uppercase + string.digits):
+                    return ''.join(random.choice(chars) for _ in range(size))
                     
                  
                 await msg15.remove_reaction("🚫", host)
-                
-                await txt.send(f"{user.mention} Closed The Lobby, Closing Lobby In 5 Seconds")
-                await invite.delete()
-                closed=discord.Embed(title=f"Joining Unavaliable", color=0xff0000)
-                closed.set_author(name=f"{host} Was Looking For Crewmates!", icon_url=host.avatar_url)
-                closed.set_thumbnail(url=f"{bot.user.avatar_url}")
-                isClosed = True
-                await joinMessage.edit(embed=closed)
+                confirm_number = confirm_generator()
+
+
+                confirm=discord.Embed(color=0xff0000)
+                confirm.add_field(name="Lobby Canceling Confirmation", value=f"Type **{confirm_number}** To Close The Lobby", inline=False)
+                confirm_message = await txt.send(embed=confirm)
+                await txt.set_permissions(host, send_messages=True, read_messages=True)
+
+                def confirmationCheck(m):
+                    return str(m.content) == str(confirm_number) and m.author == host
+
+                try:
+                    confirmed = await bot.wait_for('message', timeout=60.0, check=confirmationCheck)
+                    await confirm_message.delete()
+                except:
+                    timeError = await txt.send("Timed Out")
+                    asyncio.sleep(3)
+                    await timeError.delete()
+                    await txt.set_permissions(host, send_messages=False, read_messages=True)
+                    await confirm_message.delete()
+
+                else:
+                    await txt.set_permissions(host, send_messages=False, read_messages=True)
+                    await txt.send(f"{user.mention} Closed The Lobby, Closing Lobby In 5 Seconds")
+                    await invite.delete()
+                    closed=discord.Embed(title=f"Joining Unavaliable", color=0xff0000)
+                    closed.set_author(name=f"{host} Was Looking For Crewmates!", icon_url=host.avatar_url)
+                    closed.set_thumbnail(url=f"{bot.user.avatar_url}")
+                    isClosed = True
+                    await joinMessage.edit(embed=closed)
+                    await asyncio.sleep(5)
+                    await vc.delete()
+                    await txt.delete()
+                    await category1.delete()
 
 
 
-                await asyncio.sleep(5)
-
-
-
-                await vc.delete()
-                await txt.delete()
-                await category1.delete()
-
-            elif str(reaction.emoji) == "🔇" and ctx.message.author == user:
+            elif str(reaction.emoji) == "🔇" and host == user:
                 if role != None:
                     await msg15.remove_reaction("🔇", user)
 
@@ -316,7 +337,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                         
                         muted = False
                         print(muted)
-            elif str(reaction.emoji) == "🔒" and ctx.message.author == user:
+            elif str(reaction.emoji) == "🔒" and host == user:
                 await msg15.remove_reaction("🔒", host)
                 
                 if locked == True:
@@ -330,7 +351,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     locked = True
                     print(f" locked is {locked}")
                     print(vc.members)
-            elif str(reaction.emoji) == "📝" and ctx.message.author == user:
+            elif str(reaction.emoji) == "📝" and host == user:
                 def nameCheck(m):
                     return m.content != ""
 
@@ -344,6 +365,88 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 await vc.edit(name=lobbyName.content)
                 await txt.set_permissions(host, send_messages=False, read_messages=True)
                 await txt.purge(limit=2)
+            
+            elif str(reaction.emoji) == "🔄" and host == user:
+                await msg15.remove_reaction("🔄", host)
+
+
+
+
+
+                def transfer_generator(size=6, chars=string.ascii_uppercase + string.digits):
+                    return ''.join(random.choice(chars) for _ in range(size))
+
+
+                transfer_number = transfer_generator()
+
+                def transferCheck(m):
+                    return str(m.content) == str(transfer_number) and m.author == host
+
+
+                transfer=discord.Embed(color=0x0088ff)
+                transfer.add_field(name="Host Transfer Confirmation", value=f"Type **{transfer_number}** To Confirm", inline=False)
+                transfer_message = await txt.send(embed=transfer)
+                await txt.set_permissions(ctx.message.author, send_messages=True)
+
+
+
+
+
+
+                try:
+                    confirmed = await bot.wait_for('message', timeout=60.0, check=transferCheck)
+                    await transfer_message.delete()
+                    await txt.purge(limit=1)
+                except:
+                    timout_message = await txt.send("Timeout")
+                    await asyncio.sleep(3)
+                    await timout_message.delete()
+                else:
+                    
+                    await txt.set_permissions(role_re, read_messages=True)
+                    hostMention = await txt.send(role_re.mention)
+                    grab_message=discord.Embed(color=0x0088ff)
+                    grab_message.add_field(name="This Lobby Does Not Have Any Host", value="React With 🙋‍♂️ To Claim This Lobby!", inline=False)
+                    freetograb = await txt.send(embed=grab_message)
+                    await freetograb.add_reaction("🙋‍♂️")
+                    await asyncio.sleep(2)
+
+                    def reactCheck(reaction, user):
+                        return user != "Crewmate#9393" and str(reaction.emoji) == "🙋‍♂️"
+
+                    try:
+                        reaction, user == await bot.wait_for('reaction_add', timeout=120.0, check=reactCheck)
+                    except:
+                        await txt.send("Timout, Closing Lobby!")
+                        await invite.delete()
+                        closed2=discord.Embed(title=f"Joining Unavaliable", color=0xff0000)
+                        closed2.set_author(name=f"{host} Was Looking For Crewmates!", icon_url=host.avatar_url)
+                        closed2.set_thumbnail(url=f"{bot.user.avatar_url}")
+                        isClosed = True
+                        await joinMessage.edit(embed=closed2)
+                        await asyncio.sleep(5)
+                        await vc.delete()
+                        await txt.delete()
+                        await category1.delete()
+                    else:
+                        await freetograb.delete()
+                        await hostMention.delete()
+                        claimed = await txt.send(f"{user.mention} Has Claimed The Lobby!")
+                        user = host
+                        await asyncio.sleep(3)
+                        await claimed.delete()
+                    
+
+
+
+
+
+
+
+
+                    
+
+                    
 
                 
 
@@ -373,15 +476,13 @@ async def settings(ctx, action=None, *, var=None):
     with open("roles.json", 'r') as f:
         roles = json.load(f)
 
-    with open("audit.json", 'r') as f:
-        log = json.load(f)
+
 
 
     with open("ads.json", 'r') as f:
         ad = json.load(f)
 
-    with open('defaultRoles.json', 'r') as f:
-        defRole = json.load(f)
+
 
     
 
@@ -411,14 +512,7 @@ async def settings(ctx, action=None, *, var=None):
         with open("roles.json", 'w') as f:
             json.dump(roles, f, indent=4)
         await ctx.send("Host Role Saved.")
-    
-    elif action =="setauditlogchannel" and var != None:
 
-        log[str(ctx.guild.id)] = str(var)
-
-        with open('audit.json', 'w') as f:
-            json.dump(log, f, indent=4)
-        await ctx.send("Audit Log Channel Set.")
 
     elif action == "setadlobby" and var != None:
         ad[str(ctx.guild.id)] = str(var)
@@ -427,12 +521,6 @@ async def settings(ctx, action=None, *, var=None):
             json.dump(ad, f, indent=4)
         await ctx.send("Channel set.")
 
-    elif action == "setdefaultrole" and var != None:
-        defRole[str(ctx.guild.id)] = str(var)
-
-        with open("defaultRoles.json", 'w') as f:
-            json.dump(defRole, f, indent=4)
-        await ctx.send("Default Role Has Been Set!")
 
 
 
@@ -449,7 +537,6 @@ async def settings(ctx, action=None, *, var=None):
         settings.add_field(name="Sets The Voice Channel To Open Hosted Games", value=f"`settings setvoicechannel (voice-channel-id)` ", inline=False)
         settings.add_field(name="Sets The Role Required For Start Hosting", value=f"`settings sethostrole (host-role-name)` ", inline=True)
         settings.add_field(name="Sets The Channel To Send Other People Lobbys", value=f"`settings setadlobby (AD-channel-id)` ", inline=False)
-        settings.add_field(name="Sets The Default Role, *Must Do It For Being Able To Host Closed Lobbies", value=f"`settings setdefaultrole (default-role-name)` ", inline=True)
         settings.set_footer(text=f"Requested By {ctx.message.author}")
         await ctx.send(embed=settings)
 
@@ -463,14 +550,7 @@ async def settings(ctx, action=None, *, var=None):
 
 @bot.event
 async def on_guild_join(guild):
-    with open("hidelobby.json", 'r') as f:
-        data = json.load(f)
 
-
-    data[str(guild.id)] = False
-
-    with open("hidelobby.json", 'w') as f:
-        json.dump(data, f, indent=4)
 
     with open("prefixes.json", 'r') as f:
         prefixes = json.load(f)
@@ -510,14 +590,7 @@ async def settings_error(error, ctx):
 
 @bot.event
 async def on_guild_remove(guild):
-    with open("hidelobby.json", 'r') as f:
-        data = json.load(f)
 
-
-    data.pop(str(guild.id))
-
-    with open("hidelobby.json", 'w') as f:
-        json.dump(data, f, indent=4)
 
     with open("prefixes.json", 'r') as f:
         prefixes = json.load(f)
@@ -527,13 +600,7 @@ async def on_guild_remove(guild):
     with open("prefixes.json", 'w') as f:
         json.dump(prefixes, f, indent=4)
 
-    with open("hidelobby.json", 'r') as f:
-        hide = json.load(f)
 
-    hide.pop(str(guild.id))
-
-    with open("hidelobby.json", 'w') as f:
-        json.dump(hide, f, indent=4)
 
     with open("voice.json", 'r') as f:
         voice = json.load(f)
@@ -712,4 +779,3 @@ async def help(ctx):
 
 
 bot.run(TOKEN)
-
