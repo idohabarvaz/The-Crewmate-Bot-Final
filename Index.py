@@ -226,18 +226,23 @@ async def host(ctx, players: int, *, role:discord.Role=None):
             except:
                 pass
             else:
-                
+            
+            if role != None and isClosed is False:
                 join2=discord.Embed(title=f"Click Me To Join!", color=0x11ff00)
                 join2.set_author(name=f"{host} Is Looking For Crewmates!", icon_url=host.avatar_url)
                 join2.set_thumbnail(url=f"{bot.user.avatar_url}")
                 join2.add_field(name="**Players Playing:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
                 join2.add_field(name="**Voice Name:**", value=f"{vc.name}", inline=True)
-            if role != None and isClosed is False:
                 join2.add_field(name="**Lobby Status:**", value=f"Closed For {role.mention}", inline=True)
                 await joinMessage.edit(embed=join2)
             elif role == None and isClosed is False:
-                join2.add_field(name="**Lobby Status:**", value=f"Open", inline=True)
-                await joinMessage.edit(embed=join2)
+                join3=discord.Embed(title=f"Click Me To Join!", color=0x11ff00)
+                join3.set_author(name=f"{host} Is Looking For Crewmates!", icon_url=host.avatar_url)
+                join3.set_thumbnail(url=f"{bot.user.avatar_url}")
+                join3.add_field(name="**Players Playing:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
+                join3.add_field(name="**Voice Name:**", value=f"{vc.name}", inline=True)
+                join3.add_field(name="**Lobby Status:**", value=f"Open", inline=True)
+                await joinMessage.edit(embed=join3)
 
 
 
