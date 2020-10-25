@@ -122,7 +122,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
     elif role_re not in ctx.message.author.roles:
         await ctx.send("You Don't Have The Required Role To Start Hosting!")
-    elif players < 11 and players > 3 and str(ctx.message.author.voice.channel.id) == data[str(ctx.guild.id)] or voice_channel.lower() == "all" and data[str(ctx.guild.id)] != None and role_re in ctx.message.author.roles:
+    elif players < 11 and players > 3 and str(ctx.message.author.voice.channel.id) == data[str(ctx.guild.id)] or voice_channel1.lower() == "all" and data[str(ctx.guild.id)] != None and role_re in ctx.message.author.roles:
         await ctx.send("Creating Lobby...")
         gamenum = random.randint(1000, 9999)
         if role == None:
@@ -537,7 +537,7 @@ async def settings(ctx, action=None, *, var=None):
 
 
     elif var == None and action == None:
-         get_vc = bot.get_channel(id=voice[str(ctx.guild.id)])
+        get_vc = bot.get_channel(id=voice[str(ctx.guild.id)])
         settings=discord.Embed(title="**Crewmate Settings**", color=0xb6a5a5)
         settings.add_field(name=f"Sets The Voice Channel To Open Hosted Games. Currently Set To {get_vc.lower()}", value=f"`settings setvoicechannel (voice-channel-id)` Type **All** For Every Channel", inline=False)
         settings.add_field(name="Sets The Role Required For Start Hosting", value=f"`settings sethostrole (host-role-name)` ", inline=True)
