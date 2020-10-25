@@ -74,9 +74,6 @@ async def host(ctx, players: int, *, role:discord.Role=None):
         ad = json.load(f)
 
 
-    currently_VC = await bot.get_channel(id=data[str(ctx.guild.id)])
-
-
 
     
 
@@ -107,7 +104,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
         error2 = await ctx.send("There was a problem, please enter a number larger than 3 and make sure you are in the required voice channel to start hosting!")
         await asyncio.sleep(10)
         await error2.delete()
-    elif str(ctx.message.author.voice.channel.id) != data[str(guild.id)] and data[str(guild.id)] != "all":
+    elif str(ctx.message.author.voice.channel.id) != data[str(guild.id)] and data[str(guild.id)] != "None":
         print(ctx.message.author.voice.channel.id)
         print(data[str(guild.id)])
         error = await ctx.send("Join The Required Voice Channel To Start Hosting!")
@@ -121,7 +118,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
     elif role_re not in ctx.message.author.roles:
         await ctx.send("You Don't Have The Required Role To Start Hosting!")
-    elif players < 11 and players > 3 and str(ctx.message.author.voice.channel.id) == data[str(ctx.guild.id)] or data[str(ctx.guild.id)] == "all" and data[str(ctx.guild.id)] != None and role_re in ctx.message.author.roles:
+    elif players < 11 and players > 3 and str(ctx.message.author.voice.channel.id) == data[str(ctx.guild.id)] or data[str(ctx.guild.id)] == "None" and data[str(ctx.guild.id)] != None and role_re in ctx.message.author.roles:
         await ctx.send("Creating Lobby...")
         gamenum = random.randint(1000, 9999)
         if role == None:
@@ -537,7 +534,7 @@ async def settings(ctx, action=None, *, var=None):
 
     elif var == None and action == None:
         settings=discord.Embed(title="**Crewmate Settings**", color=0xb6a5a5)
-        settings.add_field(name=f"Sets The Voice Channel To Open Hosted Games. Currently Set To {await bot.get_channel(id=voice[str(ctx.guild.id)])}", value=f"`settings setvoicechannel (voice-channel-id)` Type **None** For Every Channel", inline=False)
+        settings.add_field(name="Sets The Voice Channel To Open Hosted Games", value=f"`settings setvoicechannel (voice-channel-id)` Type **None** For Every Channel", inline=False)
         settings.add_field(name="Sets The Role Required For Start Hosting", value=f"`settings sethostrole (host-role-name)` ", inline=True)
         settings.add_field(name="Sets The Channel To Send Other People Lobbys", value=f"`settings setadlobby (AD-channel-id)` ", inline=False)
         settings.set_footer(text=f"Requested By {ctx.message.author}")
