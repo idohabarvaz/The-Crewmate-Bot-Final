@@ -537,7 +537,17 @@ async def settings(ctx, action=None, *, var=None):
 
 
     elif var == None and action == None:
-        get_vc = bot.get_channel(id=voice[str(ctx.guild.id)])
+        try:
+            get_vc = bot.get_channel(id=voice[str(ctx.guild.id)])
+        except:
+        settings=discord.Embed(title="**Crewmate Settings**", color=0xb6a5a5)
+        settings.add_field(name=f"Sets The Voice Channel To Open Hosted Games. Currently Set To {voice[str(ctx.guild.id)]}", value=f"`settings setvoicechannel (voice-channel-id)` Type **All** For Every Channel", inline=False)
+        settings.add_field(name="Sets The Role Required For Start Hosting", value=f"`settings sethostrole (host-role-name)` ", inline=True)
+        settings.add_field(name="Sets The Channel To Send Other People Lobbys", value=f"`settings setadlobby (AD-channel-id)` ", inline=False)
+        settings.set_footer(text=f"Requested By {ctx.message.author}")
+        await ctx.send(embed=settings)
+        else:
+
         settings=discord.Embed(title="**Crewmate Settings**", color=0xb6a5a5)
         settings.add_field(name=f"Sets The Voice Channel To Open Hosted Games. Currently Set To {get_vc.lower()}", value=f"`settings setvoicechannel (voice-channel-id)` Type **All** For Every Channel", inline=False)
         settings.add_field(name="Sets The Role Required For Start Hosting", value=f"`settings sethostrole (host-role-name)` ", inline=True)
