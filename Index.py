@@ -304,6 +304,10 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                         closed.set_author(name=f"{host} Was Looking For Crewmates!", icon_url=host.avatar_url)
                         closed.set_thumbnail(url=f"{bot.user.avatar_url}")
                         await joinMessage.edit(embed=closed)
+                    except:
+                        pass
+                    else:
+                        pass
                     isClosed = True
                     await asyncio.sleep(5)
                     await vc.delete()
