@@ -386,7 +386,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 transfer=discord.Embed(color=0x0088ff)
                 transfer.add_field(name="Host Transfer Confirmation", value=f"Type **{transfer_number}** To Confirm", inline=False)
                 transfer_message = await txt.send(embed=transfer)
-                await txt.set_permissions(ctx.message.author, send_messages=True)
+                await txt.set_permissions(host, send_messages=True, read_messages=True)
 
 
 
@@ -397,7 +397,9 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     confirmed = await bot.wait_for('message', timeout=60.0, check=transferCheck)
                     await transfer_message.delete()
                     await txt.purge(limit=1)
+                    await txt.set_permissions(host, send_messages=False, read_messages=True)
                 except:
+                    await txt.set_permissions(host, send_messages=False, read_messages=True)
                     timout_message = await txt.send("Timeout")
                     await asyncio.sleep(3)
                     await timout_message.delete()
@@ -409,7 +411,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     grab_message.add_field(name="This Lobby Does Not Have Any Host", value="React With 🙋‍♂️ To Claim This Lobby!", inline=False)
                     freetograb = await txt.send(embed=grab_message)
                     await freetograb.add_reaction("🙋‍♂️")
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(10)
 
                     def reactCheck(reaction, user):
                         return user != "Crewmate#9393" and str(reaction.emoji) == "🙋‍♂️"
