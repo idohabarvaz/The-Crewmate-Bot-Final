@@ -413,8 +413,8 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     await freetograb.add_reaction("🙋‍♂️")
                     await asyncio.sleep(5)
 
-                    def reactCheck(reaction, user):
-                        return user != "Crewmate#9393" and user != host and str(reaction.emoji) == "🙋‍♂️"
+                    def reactCheck(react, newHoster):
+                        return newHoster != "Crewmate#9393" and newHoster != host and str(react.emoji) == "🙋‍♂️"
 
                     try:
                         reaction, user == await bot.wait_for('reaction_add', timeout=120.0, check=reactCheck)
