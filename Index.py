@@ -366,77 +366,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 await txt.set_permissions(host, send_messages=False, read_messages=True)
                 await txt.purge(limit=2)
             
-            elif str(reaction.emoji) == "🔄" and host == user:
-                await msg15.remove_reaction("🔄", host)
 
-
-
-
-
-                def transfer_generator(size=6, chars=string.ascii_uppercase + string.digits):
-                    return ''.join(random.choice(chars) for _ in range(size))
-
-
-                transfer_number = transfer_generator()
-
-                def transferCheck(m):
-                    return str(m.content) == str(transfer_number) and m.author == host
-
-
-                transfer=discord.Embed(color=0x0088ff)
-                transfer.add_field(name="Host Transfer Confirmation", value=f"Type **{transfer_number}** To Confirm", inline=False)
-                transfer_message = await txt.send(embed=transfer)
-                await txt.set_permissions(host, send_messages=True, read_messages=True)
-
-
-
-
-
-
-                try:
-                    confirmed = await bot.wait_for('message', timeout=60.0, check=transferCheck)
-                    await transfer_message.delete()
-                    await txt.purge(limit=1)
-                    await txt.set_permissions(host, send_messages=False, read_messages=True)
-                except:
-                    await txt.set_permissions(host, send_messages=False, read_messages=True)
-                    timout_message = await txt.send("Timeout")
-                    await asyncio.sleep(3)
-                    await timout_message.delete()
-                else:
-                    
-                    await txt.set_permissions(role_re, read_messages=True)
-                    hostMention = await txt.send(role_re.mention)
-                    grab_message=discord.Embed(color=0x0088ff)
-                    grab_message.add_field(name="This Lobby Does Not Have Any Host", value="React With 🙋‍♂️ To Claim This Lobby!", inline=False)
-                    freetograb = await txt.send(embed=grab_message)
-                    await freetograb.add_reaction("🙋‍♂️")
-                    await asyncio.sleep(5)
-
-                    def reactCheck(react, newHoster):
-                        return newHoster != "Crewmate#9393" and newHoster != host and str(react.emoji) == "🙋‍♂️"
-
-                    try:
-                        reaction, user == await bot.wait_for('reaction_add', timeout=120.0, check=reactCheck)
-                    except:
-                        await txt.send("Timout, Closing Lobby!")
-                        await invite.delete()
-                        closed2=discord.Embed(title=f"Joining Unavaliable", color=0xff0000)
-                        closed2.set_author(name=f"{host} Was Looking For Crewmates!", icon_url=host.avatar_url)
-                        closed2.set_thumbnail(url=f"{bot.user.avatar_url}")
-                        isClosed = True
-                        await joinMessage.edit(embed=closed2)
-                        await asyncio.sleep(5)
-                        await vc.delete()
-                        await txt.delete()
-                        await category1.delete()
-                    else:
-                        await freetograb.delete()
-                        await hostMention.delete()
-                        claimed = await txt.send(f"{user.mention} Has Claimed The Lobby!")
-                        user = host
-                        await asyncio.sleep(3)
-                        await claimed.delete()
                     
 
 
