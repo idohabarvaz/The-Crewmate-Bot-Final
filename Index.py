@@ -209,14 +209,20 @@ async def host(ctx, players: int, *, role:discord.Role=None):
         await msg.delete()
         await ctx.message.delete()
         if str(ctx.guild.id) in ad:
-            channel = bot.get_channel(int(ad[str(ctx.guild.id)]))
-            join=discord.Embed(title=f"Click Me To Join!", color=0x11ff00)
-            embed.set_author(name=f"{host} is Looking For Crewmates!", icon_url=host.avatar_url)
-            join.set_thumbnail(url=f"{bot.user.avatar_url}")
-            join.add_field(name="**Players Playing:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
-            join.add_field(name="**Voice Name:**", value=f"{vc.name}", inline=True)
-            joinMessage = await channel.send(embed=join)
-            invite = await channel.send(await vc.create_invite())
+            try:
+                int(ad[str(ctx.guild.id)])
+            except:
+                pass
+            else:
+                #
+                channel = bot.get_channel(int(ad[str(ctx.guild.id)]))
+                join=discord.Embed(title=f"Click Me To Join!", color=0x11ff00)
+                embed.set_author(name=f"{host} is Looking For Crewmates!", icon_url=host.avatar_url)
+                join.set_thumbnail(url=f"{bot.user.avatar_url}")
+                join.add_field(name="**Players Playing:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
+                join.add_field(name="**Voice Name:**", value=f"{vc.name}", inline=True)
+                joinMessage = await channel.send(embed=join)
+                invite = await channel.send(await vc.create_invite())
 
 
 
