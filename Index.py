@@ -427,7 +427,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     await asyncio.sleep(2)
 
                     def reactCheck(reaction, user):
-                        return user == host and str(reaction.emoji) == "✋"
+                        return user == user and host and str(reaction.emoji) == "✋"
 
                     try:
                         reaction, user == await bot.wait_for('reaction_add', timeout=120.0, check=reactCheck)
