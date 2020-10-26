@@ -412,7 +412,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     await asyncio.sleep(2)
 
                     def reactCheck(reaction, user):
-                        return user != "Crewmate#9393" and str(reaction.emoji) == "🙋‍♂️"
+                        return user == host and str(reaction.emoji) == "🙋‍♂️" and ctx.message.channel == reaction.message.channel
 
                     try:
                         reaction, user == await bot.wait_for('reaction_add', timeout=120.0, check=reactCheck)
@@ -431,8 +431,8 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     else:
                         await freetograb.delete()
                         await hostMention.delete()
-                        claimed = await txt.send(f"{user.mention} Has Claimed The Lobby!")
-                        user = host
+                        host = user
+                        claimed = await txt.send(f"{host.mention} Has Claimed The Lobby!")
                         await asyncio.sleep(3)
                         await claimed.delete()
                     
