@@ -421,13 +421,13 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     await txt.set_permissions(role_re, read_messages=True)
                     hostMention = await txt.send(role_re.mention)
                     grab_message=discord.Embed(color=0x0088ff)
-                    grab_message.add_field(name="This Lobby Does Not Have Any Host", value="React With 🙋‍♂️ To Claim This Lobby!", inline=False)
+                    grab_message.add_field(name="This Lobby Does Not Have Any Host", value="React With ✋ To Claim This Lobby!", inline=False)
                     freetograb = await txt.send(embed=grab_message)
-                    await freetograb.add_reaction("🙋‍♂️")
+                    await freetograb.add_reaction("✋")
                     await asyncio.sleep(2)
 
                     def reactCheck(reaction, user):
-                        return user == host and str(reaction.emoji) == "🙋‍♂️" and ctx.message.channel == reaction.message.channel
+                        return user == host and str(reaction.emoji) == "✋"
 
                     try:
                         reaction, user == await bot.wait_for('reaction_add', timeout=120.0, check=reactCheck)
