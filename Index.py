@@ -223,18 +223,23 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
 
         while True:
-            channel = bot.get_channel(int(ad[str(ctx.guild.id)]))
-            join2=discord.Embed(title=f"Click Me To Join!", color=0x11ff00)
-            join2.set_author(name=f"{host} Is Looking For Crewmates!", icon_url=host.avatar_url)
-            join2.set_thumbnail(url=f"{bot.user.avatar_url}")
-            join2.add_field(name="**Players Playing:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
-            join2.add_field(name="**Voice Name:**", value=f"{vc.name}", inline=True)
-            if role != None and isClosed is False:
-                join2.add_field(name="**Lobby Status:**", value=f"Closed For {role.mention}", inline=True)
-                await joinMessage.edit(embed=join2)
-            elif role == None and isClosed is False:
-                join2.add_field(name="**Lobby Status:**", value=f"Open", inline=True)
-                await joinMessage.edit(embed=join2)
+            try:
+                channel = bot.get_channel(int(ad[str(ctx.guild.id)]))
+            except:
+                pass
+            else:
+                #
+                join2=discord.Embed(title=f"Click Me To Join!", color=0x11ff00)
+                join2.set_author(name=f"{host} Is Looking For Crewmates!", icon_url=host.avatar_url)
+                join2.set_thumbnail(url=f"{bot.user.avatar_url}")
+                join2.add_field(name="**Players Playing:**", value=f"{len(vc.members)} \ {vc.user_limit}", inline=False)
+                join2.add_field(name="**Voice Name:**", value=f"{vc.name}", inline=True)
+                if role != None and isClosed is False:
+                    join2.add_field(name="**Lobby Status:**", value=f"Closed For {role.mention}", inline=True)
+                    await joinMessage.edit(embed=join2)
+                elif role == None and isClosed is False:
+                    join2.add_field(name="**Lobby Status:**", value=f"Open", inline=True)
+                    await joinMessage.edit(embed=join2)
 
 
 
@@ -295,12 +300,16 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 else:
                     await txt.set_permissions(host, send_messages=False, read_messages=True)
                     await txt.send(f"{user.mention} Closed The Lobby, Closing Lobby In 5 Seconds")
-                    await invite.delete()
-                    closed=discord.Embed(title=f"Joining Unavaliable", color=0xff0000)
-                    closed.set_author(name=f"{host} Was Looking For Crewmates!", icon_url=host.avatar_url)
-                    closed.set_thumbnail(url=f"{bot.user.avatar_url}")
-                    isClosed = True
-                    await joinMessage.edit(embed=closed)
+                    if str(ctx.guild.id) in ad:
+                        #
+                        await invite.delete()
+                        closed=discord.Embed(title=f"Joining Unavaliable", color=0xff0000)
+                        closed.set_author(name=f"{host} Was Looking For Crewmates!", icon_url=host.avatar_url)
+                        closed.set_thumbnail(url=f"{bot.user.avatar_url}")
+                        isClosed = True
+                        await joinMessage.edit(embed=closed)
+                    else:
+                        pass
                     await asyncio.sleep(5)
                     await vc.delete()
                     await txt.delete()
@@ -417,7 +426,10 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     try:
                         reaction, user == await bot.wait_for('reaction_add', timeout=120.0, check=reactCheck)
                     except:
-                        await txt.send("Timout, Closing Lobby!")
+                        timeout=discord.Embed(color=0xff0000)
+                        timeout.add_field(name="Couldn't Find A New Host", value="Closing Lobby...", inline=False)
+                        timeout.set_footer(text=f"Lobby Hosted By {host}")
+                        await txt.send(embed=timeout)
                         await invite.delete()
                         closed2=discord.Embed(title=f"Joining Unavaliable", color=0xff0000)
                         closed2.set_author(name=f"{host} Was Looking For Crewmates!", icon_url=host.avatar_url)
