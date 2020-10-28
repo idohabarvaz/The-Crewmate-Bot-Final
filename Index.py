@@ -531,13 +531,24 @@ async def settings(ctx, action=None, *, var=None):
 
 
     if action == "setvoicechannel" and var != None:
+        try:
+            voiceChannel = bot.get_channel(int(voice[str(guild.id)]))
+        except:
+            failed_save=discord.Embed(color=0xff0000)
+            failed_save.add_field(name="Voice Channel Failed To Save", value="Please Wait, And Try Again Later", inline=False)
+            await ctx.send(embed=failed_save)
+        else:
+            voice[str(ctx.guild.id)] = str(var)
+            with open("voice.json", 'w') as f:
+                json.dump(voice, f, indent=4)
+            success_save=discord.Embed(color=0x2ec0ff)
+            success_save.add_field(name="Voice Channel Changed", value=f"Voice Channel Set To {voiceChannel.mention}", inline=False)
+            await ctx.send(embed=success_save)
+            
 
 
-        voice[str(ctx.guild.id)] = str(var)
 
-        with open("voice.json", 'w') as f:
-            json.dump(voice, f, indent=4)
-        await ctx.send("Voice Channel Set Successfully")
+
         
 
 
@@ -555,7 +566,6 @@ async def settings(ctx, action=None, *, var=None):
 
             with open("roles.json", 'w') as f:
                 json.dump(roles, f, indent=4)
-            await ctx.send("Host Role Saved.")
             print(f"{hostrole_int}")
             mentionHost=discord.Embed(color=0x2ec0ff)
             mentionHost.add_field(name="Host Role Changed", value=f"Host Role Set To {newHostRole.mention}", inline=False)
