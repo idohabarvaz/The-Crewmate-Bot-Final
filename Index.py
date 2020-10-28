@@ -92,7 +92,14 @@ async def host(ctx, players: int, *, role:discord.Role=None):
     guild = ctx.message.guild
     author = ctx.message.author
     host = ctx.message.author
-    role_re = discord.utils.get(ctx.guild.roles, name=roles[str(ctx.guild.id)])
+    new_host = ""
+    try:
+        role_re = discord.utils.get(ctx.guild.roles, id=roles[str(ctx.guild.id)])
+    except:
+        role_re = discord.utils.get(ctx.guild.roles, name=roles[str(ctx.guild.id)])
+    else:
+        pass
+
     print(roles[str(ctx.guild.id)])
 
         
@@ -276,7 +283,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
             half = int(vc.user_limit) / 2
 
-            if str(reaction.emoji) == "🚫" and host == user and len(vc.members) <= half:
+            if str(reaction.emoji) == "🚫" and host == user or new_host == user and len(vc.members) <= half:
                 def confirm_generator(size=6, chars=string.ascii_uppercase + string.digits):
                     return ''.join(random.choice(chars) for _ in range(size))
                     
@@ -291,7 +298,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 await txt.set_permissions(host, send_messages=True, read_messages=True)
 
                 def confirmationCheck(m):
-                    return str(m.content) == str(confirm_number) and m.author == host
+                    return str(m.content) == str(confirm_number) and m.author == host or m.author == new_host
 
                 try:
                     confirmed = await bot.wait_for('message', timeout=60.0, check=confirmationCheck)
@@ -323,7 +330,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
 
 
-            elif str(reaction.emoji) == "🔇" and host == user:
+            elif str(reaction.emoji) == "🔇" and host == user or new_host == user:
                 if role != None:
                     await msg15.remove_reaction("🔇", user)
 
@@ -352,7 +359,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                         
                         muted = False
                         print(muted)
-            elif str(reaction.emoji) == "🔒" and host == user:
+            elif str(reaction.emoji) == "🔒" and host == user or new_host == user:
                 await msg15.remove_reaction("🔒", host)
                 
                 if locked == True:
@@ -366,7 +373,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     locked = True
                     print(f" locked is {locked}")
                     print(vc.members)
-            elif str(reaction.emoji) == "📝" and host == user:
+            elif str(reaction.emoji) == "📝" and host == user or new_host == user:
                 def nameCheck(m):
                     return m.content != ""
 
@@ -381,7 +388,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 await txt.set_permissions(host, send_messages=False, read_messages=True)
                 await txt.purge(limit=2)
             
-            elif str(reaction.emoji) == "🔄" and host == user:
+            elif str(reaction.emoji) == "🔄" and host == user or new_host == user:
                 await msg15.remove_reaction("🔄", host)
 
 
@@ -402,6 +409,13 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                 transfer.add_field(name="Host Transfer Confirmation", value=f"Type **{transfer_number}** To Confirm", inline=False)
                 transfer_message = await txt.send(embed=transfer)
                 await txt.set_permissions(ctx.message.author, send_messages=True)
+
+
+
+                overwrites2 = {
+                    guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                    role_re: discord.PermissionOverwrite(read_messages=True)
+                }
 
 
 
@@ -427,7 +441,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     await asyncio.sleep(2)
 
                     def reactCheck(reaction, user):
-                        return user == user and host and str(reaction.emoji) == "✋"
+                        return user == user and str(reaction.emoji) == "✋"
 
                     try:
                         reaction, user == await bot.wait_for('reaction_add', timeout=120.0, check=reactCheck)
@@ -449,8 +463,9 @@ async def host(ctx, players: int, *, role:discord.Role=None):
                     else:
                         await freetograb.delete()
                         await hostMention.delete()
-                        host = user
-                        claimed = await txt.send(f"{host.mention} Has Claimed The Lobby!")
+                        new_host = user
+                        print(new_host)
+                        claimed = await txt.send(f"{new_host.mention} Has Claimed The Lobby!")
                         await asyncio.sleep(3)
                         await claimed.delete()
                     
@@ -523,13 +538,24 @@ async def settings(ctx, action=None, *, var=None):
 
 
     elif action == "sethostrole" and var != None:
-            
-            
-        roles[str(ctx.guild.id)] = str(var)
+        if var is discord.Role:
+            hostrole =bot.get_role(var.id)
 
-        with open("roles.json", 'w') as f:
-            json.dump(roles, f, indent=4)
-        await ctx.send("Host Role Saved.")
+            roles[str(ctx.guild.id)] = str(var.id)
+
+            with open("roles.json", 'w') as f:
+                json.dump(roles, f, indent=4)
+            await ctx.send("Host Role Saved.")
+        else:
+            roles[str(ctx.guild.id)] = str(var)
+
+            with open("roles.json", 'w') as f:
+                json.dump(roles, f, indent=4)
+            await ctx.send("Host Role Saved")
+
+            
+            
+
 
 
     elif action == "setadlobby" and var != None:
@@ -553,7 +579,7 @@ async def settings(ctx, action=None, *, var=None):
     elif var == None and action == None:
         settings=discord.Embed(title="**Crewmate Settings**", color=0xb6a5a5)
         settings.add_field(name="Sets The Voice Channel To Open Hosted Games", value=f"`settings setvoicechannel (voice-channel-id)` Type **None** For Every Channel", inline=False)
-        settings.add_field(name="Sets The Role Required For Start Hosting", value=f"`settings sethostrole (host-role-name)` ", inline=True)
+        settings.add_field(name="Sets The Role Required For Start Hosting", value=f"`settings sethostrole (host-role-mention)` ", inline=True)
         settings.add_field(name="Sets The Channel To Send Other People Lobbys", value=f"`settings setadlobby (AD-channel-id)` ", inline=False)
         settings.set_footer(text=f"Requested By {ctx.message.author}")
         await ctx.send(embed=settings)
@@ -682,7 +708,7 @@ async def changeprefix(ctx, prefix):
 @bot.event
 async def on_ready():
     print("Bot Is Ready!")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"You Playing"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"@Crewmate prefix | /help"))
 
         
 
@@ -697,7 +723,7 @@ async def rename(ctx, *, new_name):
         channel = ctx.author.voice.channel
         old_name = channel.name
         await channel.edit(name=new_name)
-        await ctx.send(f"Channel Name Changed From `{old_name}`=>`{new_name}`")
+        await ctx.send(f"Channel Name Changed From `{old_name} `=>` {new_name}`")
 
 
         
@@ -797,3 +823,4 @@ async def help(ctx):
 
 
 bot.run(TOKEN)
+#bot.run("NzU5NDI5MzAyOTE4ODQwMzkx.X29Xpw.FG9Bqnxwex6hR9TLGuEvJkwKkg4")
