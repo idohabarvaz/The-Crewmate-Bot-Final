@@ -540,24 +540,26 @@ async def settings(ctx, action=None, *, var=None):
 
 
     elif action == "sethostrole" and var != None:
-        if "<" or "@" or "&" in var:
-            hostrole_int = int(re.search(r'\d+', var).group())
-            hostrole = bot.get_role(hostrole_int)
+        try:
+            hostrole_int = int(re.search(r'\d+', str(var)).group())
+            bot.get_role(hostrole_int)
 
 
-            roles[str(ctx.guild.id)] = str(var.id)
+            roles[str(ctx.guild.id)] = str(hostrole_int)
 
             with open("roles.json", 'w') as f:
                 json.dump(roles, f, indent=4)
             await ctx.send("Host Role Saved.")
-            print(f"{hostrole_int}, {hostrole}")
-        else:
+            print(f"{hostrole_int}")
+        except:
             roles[str(ctx.guild.id)] = str(var)
 
             with open("roles.json", 'w') as f:
                 json.dump(roles, f, indent=4)
             await ctx.send("Host Role Saved")
             print(var)
+        else:
+            pass
 
             
             
