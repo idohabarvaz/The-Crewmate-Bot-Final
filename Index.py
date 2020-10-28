@@ -541,8 +541,8 @@ async def settings(ctx, action=None, *, var=None):
 
     elif action == "sethostrole" and var != None:
         if "<@&"  in var:
-            hostrole = bot.get_role(var.id)
-            hostrole_int = int(re.search(r'\d+', hostrole).group())
+            hostrole_int = int(re.search(r'\d+', var).group())
+            hostrole = bot.get_role(hostrole_int)
 
 
             roles[str(ctx.guild.id)] = str(var.id)
