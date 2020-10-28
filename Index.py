@@ -96,11 +96,11 @@ async def host(ctx, players: int, *, role:discord.Role=None):
     host = ctx.message.author
     new_host = ""
     try:
-        role_re = discord.utils.get(ctx.guild.roles, id=roles[str(ctx.guild.id)])
+        role_re = discord.utils.get(ctx.guild.roles, id=int(roles[str(ctx.guild.id)]))
     except:
         role_re = discord.utils.get(ctx.guild.roles, name=roles[str(ctx.guild.id)])
     else:
-        pass
+        print(role_re)
 
     print(roles[str(ctx.guild.id)])
 
