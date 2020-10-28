@@ -531,19 +531,38 @@ async def settings(ctx, action=None, *, var=None):
 
 
     if action == "setvoicechannel" and var != None:
-        try:
-            voiceChannel = bot.get_channel(int(voice[str(guild.id)]))
-        except:
-            failed_save=discord.Embed(color=0xff0000)
-            failed_save.add_field(name="Voice Channel Failed To Save", value="Please Wait, And Try Again Later", inline=False)
-            await ctx.send(embed=failed_save)
-        else:
+        if var != "None":
+            #
+            try:
+                voiceChannel = bot.get_channel(int(var))
+            except:
+                failed_save=discord.Embed(color=0xff0000)
+                failed_save.add_field(name="Voice Channel Failed To Save", value="Please Wait, And Try Again Later", inline=False)
+                await ctx.send(embed=failed_save)
+            else:
+                voice[str(ctx.guild.id)] = str(var)
+                with open("voice.json", 'w') as f:
+                    json.dump(voice, f, indent=4)
+                if var == "None":
+                    pass
+                else:
+                    #
+                    success_save=discord.Embed(color=0x2ec0ff)
+                    success_save.add_field(name="Voice Channel Changed", value=f"Voice Channel Set To `{voiceChannel.mention}`", inline=False)
+                    await ctx.send(embed=success_save)
+        elif var == "None":
             voice[str(ctx.guild.id)] = str(var)
             with open("voice.json", 'w') as f:
                 json.dump(voice, f, indent=4)
-            success_save=discord.Embed(color=0x2ec0ff)
-            success_save.add_field(name="Voice Channel Changed", value=f"Voice Channel Set To {voiceChannel.mention}", inline=False)
-            await ctx.send(embed=success_save)
+                success_save_none=discord.Embed(color=0x2ec0ff)
+                success_save_none.add_field(name="Voice Channel Changed", value=f"Voice Channel Set To `Every Channel`", inline=False)
+                await ctx.send(embed=success_save_none)
+        else:
+            failed_save_else=discord.Embed(color=0xff0000)
+            failed_save_else.add_field(name="Voice Channel Failed To Save", value="Please Wait, And Try Again Later", inline=False)
+            await ctx.send(embed=failed_save_else)
+
+
             
 
 
