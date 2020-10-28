@@ -10,6 +10,7 @@ from discord.utils import get
 from discord.utils import find
 import datetime
 import os
+import re
 from dotenv import load_dotenv
 import string
 load_dotenv()
@@ -32,6 +33,7 @@ def get_role(bot,message):
     return roles[str(message.guild.id)]
 
 
+#int(re.search(r'\d+', string1).group())
 
 #איך הכל עושה קונפיג
 # hidelobby - מתחיל כפולס כשהבוט נכנס לשרת
@@ -538,8 +540,10 @@ async def settings(ctx, action=None, *, var=None):
 
 
     elif action == "sethostrole" and var != None:
-        if var is discord.Role:
-            hostrole =bot.get_role(var.id)
+        if "<@&"  in var:
+            hostrole = bot.get_role(var.id)
+            hostrole_int = int(re.search(r'\d+', hostrole).group())
+
 
             roles[str(ctx.guild.id)] = str(var.id)
 
