@@ -548,14 +548,14 @@ async def settings(ctx, action=None, *, var=None):
                 else:
                     #
                     success_save=discord.Embed(color=0x2ec0ff)
-                    success_save.add_field(name="Voice Channel Changed", value=f"Voice Channel Set To `{voiceChannel.mention}`", inline=False)
+                    success_save.add_field(name="Voice Channel Changed", value=f"Voice Channel Set To {voiceChannel.mention}", inline=False)
                     await ctx.send(embed=success_save)
         elif var == "None":
             voice[str(ctx.guild.id)] = str(var)
             with open("voice.json", 'w') as f:
                 json.dump(voice, f, indent=4)
                 success_save_none=discord.Embed(color=0x2ec0ff)
-                success_save_none.add_field(name="Voice Channel Changed", value=f"Voice Channel Set To `Every Channel`", inline=False)
+                success_save_none.add_field(name="Voice Channel Changed", value=f"Voice Channel Set To Every Channel", inline=False)
                 await ctx.send(embed=success_save_none)
         else:
             failed_save_else=discord.Embed(color=0xff0000)
