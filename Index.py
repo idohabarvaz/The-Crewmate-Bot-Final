@@ -542,7 +542,7 @@ async def settings(ctx, action=None, *, var=None):
     elif action == "sethostrole" and var != None:
         try:
             hostrole_int = int(re.search(r'\d+', str(var)).group())
-            bot.get_role(hostrole_int)
+            discord.utils.get(ctx.guild.roles, id=int(hostrole_int))
 
 
             roles[str(ctx.guild.id)] = str(hostrole_int)
