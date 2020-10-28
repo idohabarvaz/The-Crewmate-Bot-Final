@@ -550,7 +550,7 @@ async def settings(ctx, action=None, *, var=None):
             with open("roles.json", 'w') as f:
                 json.dump(roles, f, indent=4)
             await ctx.send("Host Role Saved.")
-            print(hostrole, var.id, var)
+            print(f"{hostrole_int}, {hostrole}")
         else:
             roles[str(ctx.guild.id)] = str(var)
 
