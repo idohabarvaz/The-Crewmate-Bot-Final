@@ -54,6 +54,10 @@ async def host(ctx, players: int, *, role:discord.Role=None):
     roles_list = ctx.author.roles
     roles_list.reverse()
     top_role = roles_list[0]
+    #bot top role
+    roles_list_bot = ctx.guild.me.roles
+    roles_list_bot.reverse()
+    top_role_bot = roles_list_bot[0]
 
 
 
@@ -127,6 +131,8 @@ async def host(ctx, players: int, *, role:discord.Role=None):
 
     elif role_re not in ctx.message.author.roles:
         await ctx.send("You Don't Have The Required Role To Start Hosting!")
+    elif role != None and top_role_bot < role:
+        pass #pass
     elif players < 11 and players > 3 and str(ctx.message.author.voice.channel.id) == data[str(ctx.guild.id)] or data[str(ctx.guild.id)] == "None" and data[str(ctx.guild.id)] != None and role_re in ctx.message.author.roles:
         await ctx.send("Creating Lobby...")
         gamenum = random.randint(1000, 9999)
