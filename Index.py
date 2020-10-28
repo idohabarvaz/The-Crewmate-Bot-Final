@@ -132,7 +132,7 @@ async def host(ctx, players: int, *, role:discord.Role=None):
     elif role_re not in ctx.message.author.roles:
         await ctx.send("You Don't Have The Required Role To Start Hosting!")
     elif role != None and top_role_bot < role:
-        pass #pass
+        await ctx.send("Sorry, my role isn't high enough to complete your request. Give me a higher role and try again.")
     elif players < 11 and players > 3 and str(ctx.message.author.voice.channel.id) == data[str(ctx.guild.id)] or data[str(ctx.guild.id)] == "None" and data[str(ctx.guild.id)] != None and role_re in ctx.message.author.roles:
         await ctx.send("Creating Lobby...")
         gamenum = random.randint(1000, 9999)
@@ -548,7 +548,7 @@ async def settings(ctx, action=None, *, var=None):
     elif action == "sethostrole" and var != None:
         try:
             hostrole_int = int(re.search(r'\d+', str(var)).group())
-            discord.utils.get(ctx.guild.roles, id=int(hostrole_int))
+            newHostRole = discord.utils.get(ctx.guild.roles, id=int(hostrole_int))
 
 
             roles[str(ctx.guild.id)] = str(hostrole_int)
@@ -557,13 +557,17 @@ async def settings(ctx, action=None, *, var=None):
                 json.dump(roles, f, indent=4)
             await ctx.send("Host Role Saved.")
             print(f"{hostrole_int}")
+            mentionHost=discord.Embed(color=0x2ec0ff)
+            mentionHost.add_field(name="Host Role Changed", value=f"Host Role Set To {newHostRole.mention}", inline=False)
+            await ctx.send(embed=mentionHost)
         except:
             roles[str(ctx.guild.id)] = str(var)
 
             with open("roles.json", 'w') as f:
                 json.dump(roles, f, indent=4)
-            await ctx.send("Host Role Saved")
-            print(var)
+            nameHost=discord.Embed(color=0x2ec0ff)
+            nameHost.add_field(name="Host Role Changed", value=f"Host Role Set To {var}", inline=False)
+            await ctx.send(embed=nameHost)
         else:
             pass
 
