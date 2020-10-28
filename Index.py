@@ -823,4 +823,4 @@ async def help(ctx):
 
 
 bot.run(TOKEN)
-#bot.run("NzU5NDI5MzAyOTE4ODQwMzkx.X29Xpw.FG9Bqnxwex6hR9TLGuEvJkwKkg4")
+
