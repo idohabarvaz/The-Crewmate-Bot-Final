@@ -536,14 +536,10 @@ async def settings(ctx, action=None, *, var=None):
             try:
                 voiceChannel = bot.get_channel(int(var))
             except:
-                month = str(datetime.utcnow().month)
-                day = str(datetime.utcnow().day)
-                hour = str(int(datetime.utcnow().hour + 2))
-                minute = str(datetime.utcnow().minute)
-                second = str(datetime.utcnow().second)
+
                 failed_save=discord.Embed(color=0xff0000)
                 failed_save.add_field(name="Voice Channel Failed To Save", value="Please Wait, And Try Again Later", inline=False)
-                failed_save.set_footer(text=f"Requsted At {day}/{month} {hour}:{minute}:{second}")
+                
                 await ctx.send(embed=failed_save)
             else:
                 voice[str(ctx.guild.id)] = str(var)
@@ -553,27 +549,19 @@ async def settings(ctx, action=None, *, var=None):
                     pass
                 else:
                     #
-                    month = str(datetime.utcnow().month)
-                    day = str(datetime.utcnow().day)
-                    hour = str(int(datetime.utcnow().hour + 2))
-                    minute = str(datetime.utcnow().minute)
-                    second = str(datetime.utcnow().second)
+
                     success_save=discord.Embed(color=0x2ec0ff)
                     success_save.add_field(name="Voice Channel Changed", value=f"Voice Channel Set To {voiceChannel.mention}", inline=False)
-                    success_save.set_footer(text=f"Changed At {day}/{month} {hour}:{minute}:{second}")
+                    
                     await ctx.send(embed=success_save)
         elif var == "None":
             voice[str(ctx.guild.id)] = str(var)
             with open("voice.json", 'w') as f:
                 json.dump(voice, f, indent=4)
-            month = str(datetime.utcnow().month)
-            day = str(datetime.utcnow().day)
-            hour = str(int(datetime.utcnow().hour + 2))
-            minute = str(datetime.utcnow().minute)
-            second = str(datetime.utcnow().second)
+ 
             success_save_none=discord.Embed(color=0x2ec0ff)
             success_save_none.add_field(name="Voice Channel Changed", value=f"Voice Channel Set To Every Channel", inline=False)
-            success_save_none.set_footer(text=f"Changed At {day}/{month} {hour}:{minute}:{second}")
+            
             await ctx.send(embed=success_save_none)
         else:
             failed_save_else=discord.Embed(color=0xff0000)
@@ -604,28 +592,20 @@ async def settings(ctx, action=None, *, var=None):
             with open("roles.json", 'w') as f:
                 json.dump(roles, f, indent=4)
             print(f"{hostrole_int}")
-            month = str(datetime.utcnow().month)
-            day = str(datetime.utcnow().day)
-            hour = str(int(datetime.utcnow().hour + 2))
-            minute = str(datetime.utcnow().minute)
-            second = str(datetime.utcnow().second)
+ 
             mentionHost=discord.Embed(color=0x2ec0ff)
             mentionHost.add_field(name="Host Role Changed", value=f"Host Role Set To {newHostRole.mention}", inline=False)
-            mentionHost.set_footer(text=f"Changed At {day}/{month} {hour}:{minute}:{second}")
+            
             await ctx.send(embed=mentionHost)
         except:
             roles[str(ctx.guild.id)] = str(var)
 
             with open("roles.json", 'w') as f:
                 json.dump(roles, f, indent=4)
-            month = str(datetime.utcnow().month)
-            day = str(datetime.utcnow().day)
-            hour = str(int(datetime.utcnow().hour + 2))
-            minute = str(datetime.utcnow().minute)
-            second = str(datetime.utcnow().second)
+
             nameHost=discord.Embed(color=0x2ec0ff)
             nameHost.add_field(name="Host Role Changed", value=f"Host Role Set To {var}", inline=False)
-            mentionHost.set_footer(text=f"Changed At {day}/{month} {hour}:{minute}:{second}")
+            
             await ctx.send(embed=nameHost)
         else:
             pass
@@ -654,16 +634,12 @@ async def settings(ctx, action=None, *, var=None):
 
 
     elif var == None and action == None:
-        month = str(datetime.utcnow().month)
-        day = str(datetime.utcnow().day)
-        hour = str(int(datetime.utcnow().hour + 2))
-        minute = str(datetime.utcnow().minute)
-        second = str(datetime.utcnow().second)
+
         settings=discord.Embed(title="**Crewmate Settings**", color=0xb6a5a5)
         settings.add_field(name="Sets The Voice Channel To Open Hosted Games", value=f"`settings setvoicechannel (voice-channel-id)` Type **None** For Every Channel", inline=False)
         settings.add_field(name="Sets The Role Required For Start Hosting", value=f"`settings sethostrole (host-role-mention)` ", inline=True)
         settings.add_field(name="Sets The Channel To Send Other People Lobbys", value=f"`settings setadlobby (AD-channel-id)` ", inline=False)
-        settings.set_footer(text=f"Requested By {ctx.message.author} At {day}/{month} {hour}:{minute}:{second}")
+        settings.set_footer(text=f"Requested By {ctx.message.author}")
         await ctx.send(embed=settings)
 
 
