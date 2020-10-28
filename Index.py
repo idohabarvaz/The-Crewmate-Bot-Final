@@ -546,12 +546,14 @@ async def settings(ctx, action=None, *, var=None):
             with open("roles.json", 'w') as f:
                 json.dump(roles, f, indent=4)
             await ctx.send("Host Role Saved.")
+            print(hostrole, var.id, var)
         else:
             roles[str(ctx.guild.id)] = str(var)
 
             with open("roles.json", 'w') as f:
                 json.dump(roles, f, indent=4)
             await ctx.send("Host Role Saved")
+            print(var)
 
             
             
@@ -823,4 +825,3 @@ async def help(ctx):
 
 
 bot.run(TOKEN)
-
