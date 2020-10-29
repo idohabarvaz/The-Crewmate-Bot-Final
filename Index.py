@@ -13,12 +13,11 @@ import os
 import re
 from dotenv import load_dotenv
 import string
-import psycopg2
+
 load_dotenv()
 
 TOKEN = os.environ["TOKEN"]
-DATABASE_URL = os.environ['DATABASE_URL']
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
 
 print(os.environ)
 def get_prefix(bot, message):
